@@ -20,7 +20,7 @@ docker run --name adguard \
 | `uid` | 1000 | user id 1000 |
 | `gid` | 1000 | group id 1000 |
 | `home` | /adguard | home directory of user docker |
-| `webui` | https://${IP}:8443 | default web ui|
+| `web` | https://${IP}:8443 | default web ui|
 | `login` | admin // adguard | default login |
 
 ## Parent
