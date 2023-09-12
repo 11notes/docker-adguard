@@ -1,0 +1,34 @@
+dns:
+  bind_hosts:
+    - 0.0.0.0
+  ratelimit: 256
+  aaaa_disabled: true
+  all_servers: true
+  upstream_dns:
+    - 9.9.9.10
+  bootstrap_dns:
+    - 9.9.9.10
+
+dhcp:
+  enabled: false
+
+http:
+  address: 0.0.0.0:3000
+  session_ttl: 720h
+
+users:
+  - name: admin
+    password: $2b$12$xzIFiVMrq2jv5NH5pNNQSuEK84FDNI4PoiJbKIhZqUe1Ld/v1BI9W
+
+auth_attempts: 3
+block_auth_min: 60
+
+tls:
+  enabled: true
+  server_name: ""
+  force_https: true
+  port_https: 8443
+  certificate_chain: ""
+  private_key: ""
+  certificate_path: /adguard/ssl/cert.pem
+  private_key_path: /adguard/ssl/key.pem
