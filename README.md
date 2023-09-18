@@ -8,6 +8,9 @@ Run AdGuard based on Alpine Linux. Small, lightweight, secure and fast 🏔️
 ## Run
 ```shell
 docker run --name adguard \
+  -p 53:53 \
+  -p 53:53/udp \
+  -p 8443:8443/tcp \
   -v ../etc:/adguard/etc \
   -v ../var:/adguard/var \
   -d 11notes/adguard:[tag]

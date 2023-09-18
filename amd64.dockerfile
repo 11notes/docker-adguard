@@ -34,6 +34,7 @@
 			mkdir -p ${APP_ROOT}; \
       mkdir -p ${APP_ROOT}/etc; \
       mkdir -p ${APP_ROOT}/var; \
+      mkdir -p ${APP_ROOT}/run; \
       mkdir -p ${APP_ROOT}/ssl;
 
   # :: install application

@@ -8,7 +8,7 @@
     set -- "AdGuardHome" \
       -c /adguard/etc/AdGuardHome.yaml \
       -w /adguard/var \
-      --pidfile /var/run/adguard.pid \
+      --pidfile /adguard/run/adguard.pid \
       --no-check-update
   fi
 
