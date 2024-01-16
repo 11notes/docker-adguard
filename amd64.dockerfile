@@ -1,6 +1,9 @@
 # :: Builder
-  FROM node:16.20.2-alpine as build
-  ENV checkout=v0.107.38
+  FROM 11notes/node:stable as build
+  ENV checkout=v0.107.43
+  ENV NODE_OPTIONS=--openssl-legacy-provider
+
+  USER root
 
   RUN set -ex; \
     apk add --no-cache \
@@ -15,10 +18,15 @@
       g++ \
       git \
       npm \
-      yarn; \
+      yarn;
+    
+  RUN set -ex; \
     git clone https://github.com/AdguardTeam/AdGuardHome.git; \
     cd /AdGuardHome; \
-    git checkout ${checkout}; \
+    git checkout ${checkout};
+
+  RUN set -ex; \
+    cd /AdGuardHome; \
     make;
 
 # :: Header
@@ -51,7 +59,10 @@
         ${APP_ROOT};
 
 # :: Volumes
-	VOLUME ["${APP_ROOT}"]
+	VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
+
+# :: Monitor
+  HEALTHCHECK CMD /usr/local/bin/healthcheck.sh || exit 1
 
 # :: Start
 	USER docker
