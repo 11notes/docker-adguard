@@ -1,5 +1,5 @@
 # Alpine :: AdGuard
-![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.38?color=0eb305) ![version](https://img.shields.io/docker/v/11notes/adguard?color=eb7a09) ![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6) ![activity](https://img.shields.io/github/commit-activity/m/11notes/docker-adguard?color=c91cb8) ![commit-last](https://img.shields.io/github/last-commit/11notes/docker-adguard?color=c91cb8)
+![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.43?color=0eb305) ![version](https://img.shields.io/docker/v/11notes/adguard?color=eb7a09) ![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6) ![activity](https://img.shields.io/github/commit-activity/m/11notes/docker-adguard?color=c91cb8) ![commit-last](https://img.shields.io/github/last-commit/11notes/docker-adguard?color=c91cb8)
 
 Run AdGuard based on Alpine Linux. Small, lightweight, secure and fast 🏔️
 
