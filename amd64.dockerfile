@@ -49,7 +49,7 @@
       CHANNEL="release" \
       VERSION=${APP_VERSION} \
       SIGN=0 \
-      VERBOSE=1; \
+      VERBOSE=0; \
     mv /AdGuardHome/dist/AdGuardHome_${APP_OS}_${APP_ARCH}/AdGuardHome/AdGuardHome /usr/local/bin;
 
 # :: Header
