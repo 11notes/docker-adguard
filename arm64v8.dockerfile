@@ -2,10 +2,10 @@
   FROM multiarch/qemu-user-static:x86_64-aarch64 as qemu
 
 # :: Builder
-  FROM 11notes/node:arm64v8-stable as build
+  FROM 11notes/node:stable as build
   ENV APP_ROOT=/AdGuardHome
   ENV APP_VERSION=v0.107.43
-  ENV APP_ARCH="aarch64"
+  ENV APP_ARCH="arm64"
   ENV APP_OS="linux"
 
   USER root
@@ -52,7 +52,7 @@
       CHANNEL="release" \
       VERSION=${APP_VERSION} \
       SIGN=0 \
-      VERBOSE=0; \
+      VERBOSE=1; \
     mv /AdGuardHome/dist/AdGuardHome_${APP_OS}_${APP_ARCH}/AdGuardHome/AdGuardHome /usr/local/bin;
 
 # :: Header
