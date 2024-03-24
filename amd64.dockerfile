@@ -1,7 +1,7 @@
 # :: Builder
   FROM 11notes/node:stable as build
   ENV APP_ROOT=/AdGuardHome
-  ENV APP_VERSION=v0.107.43
+  ENV APP_VERSION=v0.107.46
   ENV APP_ARCH="amd64"
   ENV APP_OS="linux"
 
