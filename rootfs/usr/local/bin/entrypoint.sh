@@ -1,6 +1,6 @@
 #!/bin/ash
   if [ -z "${1}" ]; then
-    if [ ! -f "${APP_ROOT}/ssl/cert.pem" ]; then
+    if [ ! -f "${APP_ROOT}/ssl/default.crt" ]; then
       elevenLogJSON debug "creating default SSL certificate"
       openssl req -x509 -newkey rsa:4096 -subj "/C=XX/ST=XX/L=XX/O=XX/OU=XX/CN=adguard" \
         -keyout "${APP_ROOT}/ssl/default.key" \
