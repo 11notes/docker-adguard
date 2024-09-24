@@ -1,12 +1,17 @@
-# :: QEMU
-  FROM multiarch/qemu-user-static:x86_64-aarch64 as qemu
+# :: Util
+  FROM alpine as util
 
-# :: Builder
+  RUN set -ex; \
+    apk add --no-cache \
+      git; \
+    git clone https://github.com/11notes/util.git;
+
+# :: Build
   FROM 11notes/node:stable as build
-  ENV APP_ROOT=/AdGuardHome
-  ENV APP_VERSION=v0.107.46
-  ENV APP_ARCH="arm64"
-  ENV APP_OS="linux"
+  ENV BUILD_ROOT=/AdGuardHome
+  ENV BUILD_VERSION=0.107.52
+  ENV BUILD_ARCH="arm64"
+  ENV BUILD_OS="linux"
 
   USER root
 
@@ -29,36 +34,27 @@
       yarn;
     
   RUN set -ex; \
-    git clone https://github.com/AdguardTeam/AdGuardHome.git; \
-    cd ${APP_ROOT}; \
-    git checkout ${APP_VERSION};
-
-  # fix security
-  RUN set -ex; \    
-    # CVE-2023-49295⁠
-    sed -i 's#github.com/quic-go/quic-go .*$#github.com/quic-go/quic-go v0.40.1#g' ${APP_ROOT}/go.mod; \ 
-    # CVE-2023-48795
-    sed -i 's#golang.org/x/crypto .*$#golang.org/x/crypto v0.17.0#g' ${APP_ROOT}/go.mod; \
-    cd ${APP_ROOT}; \
-    go mod tidy;
+    git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${BUILD_VERSION};
 
   RUN set -ex; \
-    cd ${APP_ROOT}; \
+    cd ${BUILD_ROOT}; \
     make \
       build-release \
       NODE_OPTIONS="--openssl-legacy-provider" \
-      ARCH=${APP_ARCH} \
-      OS=${APP_OS} \
+      ARCH=${BUILD_ARCH} \
+      OS=${BUILD_OS} \
       CHANNEL="release" \
       VERSION=${APP_VERSION} \
       SIGN=0 \
-      VERBOSE=1; \
-    mv /AdGuardHome/dist/AdGuardHome_${APP_OS}_${APP_ARCH}/AdGuardHome/AdGuardHome /usr/local/bin;
+      VERBOSE=0; \
+    mv /AdGuardHome/dist/AdGuardHome_${BUILD_OS}_${BUILD_ARCH}/AdGuardHome/AdGuardHome /usr/local/bin;
 
 # :: Header
-	FROM 11notes/alpine:arm64v8-stable
-  COPY --from=qemu /usr/bin/qemu-aarch64-static /usr/bin
+	FROM --platform=linux/arm64 11notes/alpine:stable
   ENV APP_ROOT=/adguard
+  ENV APP_NAME="adguard"
+  ENV APP_VERSION=0.107.52
+  COPY --from=util /util/linux/shell/elevenLogJSON /usr/local/bin
   COPY --from=build /usr/local/bin/AdGuardHome /usr/local/bin
 
 # :: Run
@@ -69,8 +65,8 @@
 			mkdir -p ${APP_ROOT}; \
       mkdir -p ${APP_ROOT}/etc; \
       mkdir -p ${APP_ROOT}/var; \
-      mkdir -p ${APP_ROOT}/run; \
-      mkdir -p ${APP_ROOT}/ssl;
+      mkdir -p ${APP_ROOT}/ssl; \
+      mkdir -p ${APP_ROOT}/run;
 
   # :: install application
     RUN set -ex; \
@@ -86,7 +82,7 @@
         ${APP_ROOT};
 
 # :: Volumes
-	VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
+	VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var", "${APP_ROOT}/ssl"]
 
 # :: Monitor
   HEALTHCHECK CMD /usr/local/bin/healthcheck.sh || exit 1

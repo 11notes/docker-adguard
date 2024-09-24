@@ -31,6 +31,6 @@ tls:
   port_https: 8443
   certificate_chain: ""
   private_key: ""
-  certificate_path: /adguard/ssl/cert.pem
-  private_key_path: /adguard/ssl/key.pem
+  certificate_path: /adguard/ssl/default.crt
+  private_key_path: /adguard/ssl/default.key
 schema_version: 27

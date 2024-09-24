@@ -1,24 +1,47 @@
-# Alpine :: AdGuard
-![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.43?color=0eb305) ![version](https://img.shields.io/docker/v/11notes/adguard?color=eb7a09) ![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6) ![activity](https://img.shields.io/github/commit-activity/m/11notes/docker-adguard?color=c91cb8) ![commit-last](https://img.shields.io/github/last-commit/11notes/docker-adguard?color=c91cb8)
+![Banner](https://github.com/11notes/defaults/blob/main/static/img/banner.png?raw=true)
 
-Run AdGuard based on Alpine Linux. Small, lightweight, secure and fast 🏔️
+# 🏔️ Alpine - adguard
+![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.52?color=0eb305) ![version](https://img.shields.io/docker/v/11notes/adguard/0.107.52?color=eb7a09) ![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6)
 
-## Volumes
+**Run your on-prem DNS blocker with ease and security in mind**
+
+# SYNOPSIS
+What can I do with this? Block most ads from most websites, have entire categories blocked on your or other networks or for individual clients. Perfect for parents and enterprises alike.
+
+# VOLUMES
 * **/adguard/etc** - Directory of your configuration file (AdGuardHome.yaml)
 * **/adguard/var** - Directory of your database
 
-## Run
-```shell
-docker run --name adguard \
-  -p 53:53 \
-  -p 53:53/udp \
-  -p 8443:8443/tcp \
-  -v ../etc:/adguard/etc \
-  -v ../var:/adguard/var \
-  -d 11notes/adguard:[tag]
+# COMPOSE
+```yaml
+services:
+  adguard:
+    image: "11notes/adguard:0.107.52"
+    container_name: "adguard"
+    environment:
+      TZ: "Europe/Zurich"
+    volumes:
+      - "etc:/adguard/etc"
+      - "var:/adguard/var"
+    networks:
+      macvlan:
+        ipv4_address: 10.255.255.53
+    restart: always
+volumes:
+  etc:
+  var:
+networks:
+  macvlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: "10.255.255.0/24"
+          gateway: "10.255.255.254"
 ```
 
-## Defaults
+# DEFAULT SETTINGS
 | Parameter | Value | Description |
 | --- | --- | --- |
 | `user` | docker | user docker |
@@ -28,13 +51,27 @@ docker run --name adguard \
 | `web` | https://${IP}:8443 | default web ui |
 | `login` | admin // adguard | default login |
 
-## Parent
-* [11notes/alpine:stable](https://github.com/11notes/docker-alpine)
 
-## Built with
-* [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)
-* [Alpine Linux](https://alpinelinux.org)
+# ENVIRONMENT
+| Parameter | Value | Default |
+| --- | --- | --- |
+| `TZ` | [Time Zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) | |
+| `DEBUG` | Show debug information | |
 
-## Tips
-* Only use rootless container runtime (podman, rootless docker)
-* Don't bind to ports < 1024 (requires root), use NAT/reverse proxy (haproxy, traefik, nginx)
+# SOURCE
+* [11notes/adguard](https://github.com/11notes/docker-adguard)
+
+# PARENT IMAGE
+* [11notes/alpine:stable](https://hub.docker.com/r/11notes/alpine)
+
+# BUILT WITH
+* [adguard](https://github.com/AdguardTeam/AdGuardHome)
+* [alpine](https://alpinelinux.org)
+
+# TIPS
+* Use a reverse proxy like Traefik, Nginx to terminate TLS with a valid certificate
+* Use Let’s Encrypt certificates to protect your SSL endpoints
+
+# ElevenNotes<sup>™️</sup>
+This image is provided to you at your own risk. Always make backups before updating an image to a new version. Check the changelog for breaking changes. You can find all my repositories on [github](https://github.com/11notes).
+    

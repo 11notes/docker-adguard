@@ -1,0 +1,25 @@
+services:
+  adguard:
+    image: "11notes/adguard:0.107.52"
+    container_name: "adguard"
+    environment:
+      TZ: "Europe/Zurich"
+    volumes:
+      - "etc:/adguard/etc"
+      - "var:/adguard/var"
+    networks:
+      macvlan:
+        ipv4_address: 10.255.255.53
+    restart: always
+volumes:
+  etc:
+  var:
+networks:
+  macvlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: "10.255.255.0/24"
+          gateway: "10.255.255.254"
