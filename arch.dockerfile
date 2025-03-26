@@ -1,10 +1,15 @@
+# :: Util
+  FROM 11notes/util AS util
+
 # :: Distroless
   FROM 11notes/distroless AS distroless
 
 # :: Build / adguard
   FROM golang:1.24-alpine AS adguard
+  COPY --from=util /usr/local/bin/ /usr/local/bin
   ARG TARGETARCH
   ARG APP_VERSION
+  ENV BUILD_DIR=/go/AdGuardHome
   ARG APP_ROOT
 
   USER root
@@ -37,8 +42,15 @@
   COPY /build/adguard/go/ /go
 
   RUN set -ex; \
-    cd /go/AdGuardHome; \
+    cd ${BUILD_DIR}; \
     git apply --whitespace=fix cap.patch; \
+    eleven patchGoMod ${BUILD_DIR}/go.mod "golang.org/x/crypto|v0.31.0|CVE-2024-45337"; \
+    eleven patchGoMod ${BUILD_DIR}/go.mod "github.com/quic-go/quic-go|v0.48.2|CVE-2024-53259"; \
+    eleven patchGoMod ${BUILD_DIR}/go.mod "golang.org/x/net|v0.36.0|CVE-2025-22870"; \
+    go mod tidy;
+
+  RUN set -ex; \
+    cd ${BUILD_DIR}; \
     make \
       build-release \
       CHANNEL="release" \
@@ -53,8 +65,8 @@
       -keyout "${APP_ROOT}/etc/ssl/default.key" \
       -out "${APP_ROOT}/etc/ssl/default.crt" \
       -days 3650 -nodes -sha256 &> /dev/null; \
-    strip -v /go/AdGuardHome/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome; \
-    mv /go/AdGuardHome/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome ${APP_ROOT}/opt;
+    strip -v ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome; \
+    mv ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome ${APP_ROOT}/opt;
 
 
 # :: Build / dnslookup 
