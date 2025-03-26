@@ -1,0 +1,22 @@
+{
+  "image":"11notes/adguard",
+  "name":"adguard",
+  "root":"/adguard",
+  
+  "semver":{
+    "version":"0.107.59",
+    "stable":"0.107.59",
+    "latest":"0.107.59"
+  },
+
+  "readme":{
+    "description":"AdGuardHome: rootless, distroless, secure by default",
+    "parent":{
+      "image":"scratch"
+    },
+    "built":{
+      "AdGuardHome":"https://github.com/AdguardTeam/AdGuardHome"
+    },
+    "distroless":true
+  }
+}

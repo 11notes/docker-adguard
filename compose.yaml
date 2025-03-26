@@ -1,25 +1,25 @@
+name: "adguard"
 services:
   adguard:
-    image: "11notes/adguard:0.107.52"
-    container_name: "adguard"
+    image: "11notes/adguard:0.107.59"
     environment:
       TZ: "Europe/Zurich"
     volumes:
       - "etc:/adguard/etc"
       - "var:/adguard/var"
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "8443:8443/tcp"
     networks:
-      macvlan:
-        ipv4_address: 10.255.255.53
-    restart: always
+      frontend:
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 53
+    restart: "always"
+
 volumes:
   etc:
   var:
+
 networks:
-  macvlan:
-    driver: macvlan
-    driver_opts:
-      parent: eth0
-    ipam:
-      config:
-        - subnet: "10.255.255.0/24"
-          gateway: "10.255.255.254"
+  frontend:

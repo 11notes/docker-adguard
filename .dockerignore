@@ -1,5 +1,7 @@
+# default
 .git*
-*.md
-LICENSE
 maintain/
-project*
+LICENSE
+*.md
+img/
+node_modules/

@@ -1,0 +1,36 @@
+${{ content_synopsis }} Block most ads from most websites, have entire categories blocked on your or other networks or for individual clients. Perfect for parents and enterprises alike.
+
+${{ content_uvp }} Good question! All the other images on the market that do exactly the same don’t do or offer these options:
+
+${{ github:> [!IMPORTANT] }}
+${{ github:> }}* This image runs as 1000:1000 by default, all other images run everything as root
+${{ github:> }}* This image has no shell since it is 100% distroless, all other images run on a distro like Debian or Alpine with full shell access (security)
+${{ github:> }}* This image does not ship with any CVE and is automatically maintained via CI/CD, all other images mostly have no CVE scanning or code quality tools in place
+${{ github:> }}* This image has no upstream dependencies, all other images have upstream dependencies
+${{ github:> }}* This image contains a patch to run rootless (Linux caps needed), all other images run everything as root with full caps
+
+If you value security, simplicity and the ability to interact with the maintainer and developer of an image. Using my images is a great start in that direction.
+
+${{ title_volumes }}
+* **${{ json_root }}/etc** - Directory of the configuration file
+* **${{ json_root }}/var** - Directory of database and query log files
+
+${{ content_compose }}
+
+${{ content_default }}
+| `login` | admin // adguard | login using default config |
+
+${{ content_environment }}
+
+${{ content_source }}
+
+${{ content_parent }}
+
+${{ content_built }}
+
+${{ content_tips }}
+
+${{ title_caution }}
+${{ github:> [!CAUTION] }}
+${{ github:> }}* This image comes with a default SSL certificate. If you plan to expose the web interface via HTTPS, please replace the default certificate with your own.
+${{ github:> }}* This image comes with a default configuration with a default password for the admin account. Please set your own password or provide your own configuration.
