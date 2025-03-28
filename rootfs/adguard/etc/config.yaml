@@ -1,0 +1,60 @@
+dns:
+  bind_hosts:
+    - 0.0.0.0
+  ratelimit: 0
+  aaaa_disabled: true
+  all_servers: true
+  upstream_dns:
+    - 9.9.9.10
+  bootstrap_dns:
+    - 9.9.9.10
+  cache_size: 1073741824
+  max_goroutines: 1024
+  hostsfile_enabled: false
+dhcp:
+  enabled: false
+http:
+  address: 0.0.0.0:3000
+  session_ttl: 720h
+querylog:
+  enabled: true
+  file_enabled: true
+  size_memory: 8
+  dir_path: /adguard/var
+users:
+  - name: admin
+    password: $2b$12$xzIFiVMrq2jv5NH5pNNQSuEK84FDNI4PoiJbKIhZqUe1Ld/v1BI9W
+auth_attempts: 3
+block_auth_min: 60
+tls:
+  enabled: true
+  server_name: ""
+  force_https: true
+  port_https: 8443
+  certificate_chain: ""
+  private_key: ""
+  certificate_path: /adguard/etc/ssl/default.crt
+  private_key_path: /adguard/etc/ssl/default.key
+filtering:
+  blocking_mode: nxdomain
+  cache_time: 1440
+  filters_update_interval: 24
+  blocked_response_ttl: 3660
+  protection_enabled: true
+clients:
+  persistent:
+    - name: dnslookup
+      ids:
+        - 127.0.0.1
+      ignore_querylog: true
+      ignore_statistics: true
+log:
+  enabled: true
+  file: ""
+  max_backups: 0
+  max_size: 100
+  max_age: 3
+  compress: false
+  local_time: true
+  verbose: false
+schema_version: 29
