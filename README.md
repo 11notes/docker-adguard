@@ -24,6 +24,7 @@ These are the main tags for the image. There is also a tag for each commit and i
 >* This image does not ship with any CVE and is automatically maintained via CI/CD, all other images mostly have no CVE scanning or code quality tools in place
 >* This image has no upstream dependencies, all other images have upstream dependencies
 >* This image contains a patch to run rootless (Linux caps needed), all other images require higher caps
+>* This image contains a proper health check that verifies the app is actually working, all other images have either no health check or only check if a port is open or ping works
 
 If you value security, simplicity and the ability to interact with the maintainer and developer of an image. Using my images is a great start in that direction.
 
@@ -91,7 +92,7 @@ log:
 schema_version: 29
 ```
 
-The default configuration contains no special settings, except ignoring the dnslookup health check in the statistics and as a client to not pollute your UI or statistics. Consider replacing it with your own or start the container with the default one and start changing what you need. The configuration will be updated with your settings if you use the mentioned volumes below. It is recommend to always add the exception for dnslookup.
+The default configuration contains no special settings, except ignoring the dnslookup health check in the statistics and as a client to not pollute your UI or statistics. Consider replacing it with your own or start the container with the default one and start changing what you need. The configuration will be updated with your settings if you use the mentioned volumes below. It is recommended to always add the exception for dnslookup.
 
 ```yaml
 clients:
@@ -171,4 +172,4 @@ ${{ content_default }}
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 28.03.2025, 09:42:48 (CET)*
+*created 28.03.2025, 10:20:25 (CET)*
