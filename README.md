@@ -19,12 +19,12 @@ These are the main tags for the image. There is also a tag for each commit and i
 **Why should I run this image and not the other image(s) that already exist?** Good question! All the other images on the market that do exactly the same don’t do or offer these options:
 
 > [!IMPORTANT]
->* This image runs as 1000:1000 by default, all other images run everything as root
->* This image has no shell since it is 100% distroless, all other images run on a distro like Debian or Alpine with full shell access (security)
->* This image does not ship with any CVE and is automatically maintained via CI/CD, all other images mostly have no CVE scanning or code quality tools in place
->* This image has no upstream dependencies, all other images have upstream dependencies
->* This image contains a patch to run rootless (Linux caps needed), all other images require higher caps
->* This image contains a proper health check that verifies the app is actually working, all other images have either no health check or only check if a port is open or ping works
+>* This image runs as 1000:1000 by default, most other images run everything as root
+>* This image has no shell since it is 100% distroless, most other images run on a distro like Debian or Alpine with full shell access (security)
+>* This image does not ship with any CVE and is automatically maintained via CI/CD, most other images mostly have no CVE scanning or code quality tools in place
+>* This image is created via a secure, pinned CI/CD process and immune to upstream attacks, most other images have upstream dependencies that can be exploited
+>* This image contains a patch to run rootless (Linux caps needed), most other images require higher caps
+>* This image contains a proper health check that verifies the app is actually working, most other images have either no health check or only check if a port is open or ping works
 
 If you value security, simplicity and the ability to interact with the maintainer and developer of an image. Using my images is a great start in that direction.
 
@@ -172,4 +172,4 @@ ${{ content_default }}
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 28.03.2025, 10:20:25 (CET)*
+*created 28.03.2025, 11:08:04 (CET)*
