@@ -1,22 +1,12 @@
-# :: Util
-  FROM 11notes/util AS util
-
-# :: Distroless
-  FROM 11notes/distroless AS distroless
-
 # :: Build / adguard
-  FROM golang:1.24-alpine AS adguard
-  COPY --from=util /usr/local/bin/ /usr/local/bin
+  FROM golang:1.24-alpine AS build
   ARG TARGETARCH
+  ARG APP_ROOT
   ARG APP_VERSION
   ENV BUILD_DIR=/go/AdGuardHome
-  ARG APP_ROOT
+  ENV CGO_ENABLED=0
 
   USER root
-
-  RUN set -ex; \
-    mkdir -p ${APP_ROOT}/etc/ssl; \
-    mkdir -p ${APP_ROOT}/opt/data;
 
   RUN set -ex; \
     apk --update --no-cache add \
@@ -43,11 +33,7 @@
 
   RUN set -ex; \
     cd ${BUILD_DIR}; \
-    git apply --whitespace=fix cap.patch; \
-    eleven patchGoMod ${BUILD_DIR}/go.mod "golang.org/x/crypto|v0.31.0|CVE-2024-45337"; \
-    eleven patchGoMod ${BUILD_DIR}/go.mod "github.com/quic-go/quic-go|v0.48.2|CVE-2024-53259"; \
-    eleven patchGoMod ${BUILD_DIR}/go.mod "golang.org/x/net|v0.36.0|CVE-2025-22870"; \
-    go mod tidy;
+    git apply --whitespace=fix cap.patch;
 
   RUN set -ex; \
     cd ${BUILD_DIR}; \
@@ -61,52 +47,44 @@
       VERBOSE=2;
 
   RUN set -ex; \
+    mkdir -p /distroless/usr/local/bin; \
+    mkdir -p /distroless/${APP_ROOT}/etc/ssl; \
+    mkdir -p /distroless/${APP_ROOT}/opt; \
     openssl req -x509 -newkey rsa:4096 -subj "/C=XX/ST=XX/L=XX/O=XX/OU=docker/CN=adguard" \
-      -keyout "${APP_ROOT}/etc/ssl/default.key" \
-      -out "${APP_ROOT}/etc/ssl/default.crt" \
+      -keyout "/distroless/${APP_ROOT}/etc/ssl/default.key" \
+      -out "/distroless/${APP_ROOT}/etc/ssl/default.crt" \
       -days 3650 -nodes -sha256 &> /dev/null; \
     strip -v ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome; \
-    mv ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome ${APP_ROOT}/opt;
+    cp ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome /distroless/usr/local/bin;
 
-
-# :: Build / dnslookup 
-  FROM golang:1.24-alpine AS dnslookup 
+# :: Distroless / adguard
+  FROM scratch AS distroless-adguard
   ARG APP_ROOT
-  USER root
+  COPY --from=build /distroless/ /
 
-  RUN set -ex; \
-    apk --update --no-cache add \
-      git; \
-    mkdir -p ${APP_ROOT}/opt; \
-    git clone https://github.com/ameshkov/dnslookup.git; \
-    cd /go/dnslookup; \
-    go build -ldflags="-extldflags=-static";
 
-  RUN set -ex; \
-    cd /go/dnslookup; \
-    ls -lah /go/dnslookup; \
-    mv /go/dnslookup/dnslookup ${APP_ROOT}/opt;
-  
-
-# :: Build / distroless
+# :: Build / file system
   FROM alpine AS fs
   ARG APP_ROOT
   USER root
 
-  # :: copy all the files needed
-  COPY --from=distroless --chown=1000:1000 /distroless/ /rootfs
-  COPY ./rootfs/ /rootfs
-  COPY --from=adguard ${APP_ROOT}/ /rootfs${APP_ROOT}
-  COPY --from=dnslookup ${APP_ROOT}/ /rootfs${APP_ROOT}
-
   RUN set -ex; \
-    mkdir -p /rootfs${APP_ROOT}/run; \
-    ln -s ${APP_ROOT}/opt/data /rootfs${APP_ROOT}/var; \
-    chmod -R 0700 /rootfs${APP_ROOT};
+    mkdir -p ${APP_ROOT}/etc; \
+    mkdir -p ${APP_ROOT}/var; \
+    mkdir -p ${APP_ROOT}/run;
+
+  COPY ./rootfs /
+
+# :: Distroless / file system
+  FROM scratch AS distroless-fs
+  ARG APP_ROOT
+  COPY --from=fs ${APP_ROOT} /${APP_ROOT}
 
 
 # :: Header
-  FROM scratch
+  FROM 11notes/distroless AS distroless
+  FROM 11notes/distroless:dnslookup AS distroless-dnslookup
+  FROM alpine
 
   # :: arguments
     ARG TARGETARCH
@@ -124,15 +102,18 @@
     ENV APP_ROOT=${APP_ROOT}
 
   # :: multi-stage
-    COPY --from=fs --chown=1000:1000 /rootfs/ /
+    COPY --from=distroless --chown=1000:1000 / /
+    COPY --from=distroless-fs --chown=1000:1000 / /
+    COPY --from=distroless-dnslookup --chown=1000:1000 / /
+    COPY --from=distroless-adguard --chown=1000:1000 / /
 
 # :: Volumes
   VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
 
 # :: Monitor
-  HEALTHCHECK --interval=5s --timeout=2s CMD ["/adguard/opt/dnslookup", ".", "NS",  "127.0.0.1"]
+  HEALTHCHECK --interval=5s --timeout=2s CMD ["dnslookup", ".", "NS",  "127.0.0.1"]
 
 # :: Start
-  USER docker
-  ENTRYPOINT ["/adguard/opt/AdGuardHome"]
-  CMD ["-c", "/adguard/etc/AdGuardHome.yaml", "--pidfile", "/adguard/run/adguard.pid", "--no-check-update"]
+  USER 1000
+  ENTRYPOINT ["AdGuardHome"]
+  CMD ["-c", "/adguard/etc/config.yaml", "--pidfile", "/adguard/run/adguard.pid", "--work-dir", "/adguard/var", "--no-check-update"]
