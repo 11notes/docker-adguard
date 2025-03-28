@@ -11,12 +11,14 @@
 
   "readme":{
     "description":"AdGuardHome: rootless, distroless, secure by default",
-    "parent":{
-      "image":"scratch"
-    },
     "built":{
       "AdGuardHome":"https://github.com/AdguardTeam/AdGuardHome"
     },
-    "distroless":true
+    "distroless":{
+      "layers":[
+        "11notes/distroless",
+        "11notes/distroless:dnslookup"
+      ]
+    }
   }
 }
