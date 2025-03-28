@@ -137,7 +137,13 @@ networks:
   frontend:
 ```
 
-${{ content_default }}
+# DEFAULT SETTINGS 🗃️
+| Parameter | Value | Description |
+| --- | --- | --- |
+| `user` | docker | user name |
+| `uid` | 1000 | [user identifier](https://en.wikipedia.org/wiki/User_identifier) |
+| `gid` | 1000 | [group identifier](https://en.wikipedia.org/wiki/Group_identifier) |
+| `home` | /adguard | home directory of user docker |
 | `login` | admin // adguard | login using default config |
 
 # ENVIRONMENT 📝
@@ -172,4 +178,4 @@ ${{ content_default }}
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 28.03.2025, 11:08:04 (CET)*
+*created 28.03.2025, 11:15:15 (CET)*
