@@ -7,9 +7,26 @@ ${{ github:> }}* This image runs as 1000:1000 by default, all other images run e
 ${{ github:> }}* This image has no shell since it is 100% distroless, all other images run on a distro like Debian or Alpine with full shell access (security)
 ${{ github:> }}* This image does not ship with any CVE and is automatically maintained via CI/CD, all other images mostly have no CVE scanning or code quality tools in place
 ${{ github:> }}* This image has no upstream dependencies, all other images have upstream dependencies
-${{ github:> }}* This image contains a patch to run rootless (Linux caps needed), all other images run everything as root with full caps
+${{ github:> }}* This image contains a patch to run rootless (Linux caps needed), all other images require higher caps
 
 If you value security, simplicity and the ability to interact with the maintainer and developer of an image. Using my images is a great start in that direction.
+
+${{ title_config }}
+```yaml
+${{ include: ./rootfs/adguard/etc/config.yaml }}
+```
+
+The default configuration contains no special settings, except ignoring the dnslookup health check in the statistics and as a client to not pollute your UI or statistics. Consider replacing it with your own or start the container with the default one and start changing what you need. The configuration will be updated with your settings if you use the mentioned volumes below. It is recommend to always add the exception for dnslookup.
+
+```yaml
+clients:
+  persistent:
+    - name: dnslookup
+      ids:
+        - 127.0.0.1
+      ignore_querylog: true
+      ignore_statistics: true
+```
 
 ${{ title_volumes }}
 * **${{ json_root }}/etc** - Directory of the configuration file
