@@ -35,7 +35,7 @@ ${{ title_volumes }}
 
 ${{ content_compose }}
 
-${{ content_default }}
+${{ content_defaults }}
 | `login` | admin // adguard | login using default config |
 
 ${{ content_environment }}
