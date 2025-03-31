@@ -2,6 +2,7 @@ name: "adguard"
 services:
   adguard:
     image: "11notes/adguard:0.107.59"
+    read_only: true
     environment:
       TZ: "Europe/Zurich"
     volumes:
