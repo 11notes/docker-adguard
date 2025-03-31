@@ -9,6 +9,7 @@ ${{ github:> }}* This image does not ship with any critical or high rated CVE an
 ${{ github:> }}* This image is created via a secure, pinned CI/CD process and immune to upstream attacks, most other images have upstream dependencies that can be exploited
 ${{ github:> }}* This image contains a patch to run rootless (Linux caps needed), most other images require higher caps
 ${{ github:> }}* This image contains a proper health check that verifies the app is actually working, most other images have either no health check or only check if a port is open or ping works
+${{ github:> }}* This image works as read-only, most other images need to write files to the image filesystem
 
 If you value security, simplicity and the ability to interact with the maintainer and developer of an image. Using my images is a great start in that direction.
 
