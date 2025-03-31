@@ -1,12 +1,18 @@
+# :: Util
+  FROM 11notes/util AS util
+
 # :: Build / adguard
   FROM golang:1.24-alpine AS build
   ARG TARGETARCH
   ARG APP_ROOT
   ARG APP_VERSION
-  ENV BUILD_DIR=/go/AdGuardHome
   ENV CGO_ENABLED=0
+  ENV BUILD_DIR=/go/AdGuardHome
+  ENV BUILD_BIN=${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome
 
   USER root
+
+  COPY --from=util /usr/local/bin/ /usr/local/bin
 
   RUN set -ex; \
     apk --update --no-cache add \
@@ -24,7 +30,8 @@
       zip \
       tar \
       yarn \
-      openssl;
+      openssl \
+      upx;
 
   RUN set -ex; \
     git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${APP_VERSION};
@@ -54,8 +61,8 @@
       -keyout "/distroless/${APP_ROOT}/etc/ssl/default.key" \
       -out "/distroless/${APP_ROOT}/etc/ssl/default.crt" \
       -days 3650 -nodes -sha256 &> /dev/null; \
-    strip -v ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome; \
-    cp ${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome /distroless/usr/local/bin;
+    eleven strip ${BUILD_BIN}; \
+    cp ${BUILD_BIN} /distroless/usr/local/bin;
 
 # :: Distroless / adguard
   FROM scratch AS distroless-adguard
@@ -84,7 +91,7 @@
 # :: Header
   FROM 11notes/distroless AS distroless
   FROM 11notes/distroless:dnslookup AS distroless-dnslookup
-  FROM alpine
+  FROM scratch
 
   # :: arguments
     ARG TARGETARCH
