@@ -10,6 +10,12 @@ on:
         required: false
         default: 'docker'
 
+      runs-on:
+        description: 'set runs-on for workflow (github or selfhosted)'
+        type: string
+        required: false
+        default: 'ubuntu-22.04'
+
       release:
         description: 'set WORKFLOW_GITHUB_RELEASE'
         required: false
@@ -19,39 +25,15 @@ on:
         description: 'set WORKFLOW_GITHUB_README'
         required: false
         default: 'false'
-
-      uid:
-        description: 'set IMAGE_UID'
-        required: false
-
-      gid:
-        description: 'set IMAGE_GID'
-        required: false
-
-      semverprefix:
-        description: 'prefix for semver tags'
-        required: false
-
-      semversuffix:
-        description: 'suffix for semver tags'
-        required: false
-
-      dockerfile:
-        description: 'dockerfile to build from'
-        required: false
-        default: 'arch.dockerfile'
-
-      tag:
-        description: 'single tag'
-        required: false
-      
-      version:
-        description: 'single version'
+        
+      etc:
+        description: 'base64 encoded json string'
         required: false
 
 jobs:
   docker:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs-on }}
+    timeout-minutes: 1440
 
     services:
       registry:
@@ -78,12 +60,17 @@ jobs:
           script: |
             const { existsSync, readFileSync } = require('node:fs');
             const { resolve } = require('node:path');
+            const { inspect } = require('node:util');
+            const { Buffer } = require('node:buffer');
             const inputs = `${{ toJSON(github.event.inputs) }}`;
             const opt = {input:{}, dot:{}};            
 
             try{
               if(inputs.length > 0){
                 opt.input = JSON.parse(inputs);
+                if(opt.input?.etc){
+                  opt.input.etc = JSON.parse(Buffer.from(opt.input.etc, 'base64').toString('ascii'));
+                }
               }
             }catch(e){
               core.warning('could not parse github.event.inputs');
@@ -104,22 +91,24 @@ jobs:
               core.setFailed(e);
             }
 
+            core.info(inspect(opt, {showHidden:false, depth:null, colors:true}));
+
             const docker = {
               image:{
                 name:opt.dot.image,
                 arch:(opt.dot.arch || 'linux/amd64,linux/arm64'),
-                prefix:((opt.input?.semverprefix) ? `${opt.input?.semverprefix}-` : ''),
-                suffix:((opt.input?.semversuffix) ? `-${opt.input?.semversuffix}` : ''),
+                prefix:((opt.input?.etc?.semverprefix) ? `${opt.input?.etc?.semverprefix}-` : ''),
+                suffix:((opt.input?.etc?.semversuffix) ? `-${opt.input?.etc?.semversuffix}` : ''),
                 description:(opt.dot?.readme?.description || ''),
                 tags:[],
               },
               app:{
                 image:opt.dot.image,
                 name:opt.dot.name,
-                version:(opt.input?.version || opt.dot.semver.version),
+                version:(opt.input?.etc?.version || opt.dot.semver.version),
                 root:opt.dot.root,
-                UID:(opt.input?.uid || 1000),
-                GID:(opt.input?.gid || 1000),
+                UID:(opt.input?.etc?.uid || 1000),
+                GID:(opt.input?.etc?.gid || 1000),
                 no_cache:new Date().getTime(),
               },
               cache:{
@@ -134,11 +123,11 @@ jobs:
             docker.app.suffix = docker.image.suffix;
 
             // setup tags
-              if(opt.input?.dockerfile !== 'arch.dockerfile' && opt.input?.tag){
+              if(opt.input?.etc?.dockerfile !== 'arch.dockerfile' && opt.input?.etc?.tag){
                 docker.image.tags.push(`${context.sha.substring(0,7)}`);
-                docker.image.tags.push(opt.input.tag);
-                docker.image.tags.push(`${opt.input.tag}-${docker.app.version}`);
-                docker.cache.name = `${docker.image.name}:buildcache-${opt.input.tag}`;
+                docker.image.tags.push(opt.input.etc.tag);
+                docker.image.tags.push(`${opt.input.etc.tag}-${docker.app.version}`);
+                docker.cache.name = `${docker.image.name}:buildcache-${opt.input.etc.tag}`;
               }else if(opt.dot?.semver?.version){
                 const semver = opt.dot.semver.version.split('.');
                 docker.image.tags.push(`${context.sha.substring(0,7)}`);
@@ -149,7 +138,7 @@ jobs:
                 }
                 if(opt.dot.semver?.stable && new RegExp(opt.dot.semver.stable, 'ig').test(docker.image.tags.join(','))) docker.image.tags.push('stable');
                 if(opt.dot.semver?.latest && new RegExp(opt.dot.semver.latest, 'ig').test(docker.image.tags.join(','))) docker.image.tags.push('latest');
-              }else if(opt.input?.version && opt.input.version === 'latest'){
+              }else if(opt.input?.etc?.version && opt.input.etc.version === 'latest'){
                 docker.image.tags.push('latest');
               }
 
@@ -175,12 +164,12 @@ jobs:
               core.exportVariable('DOCKER_IMAGE_TAGS', docker.tags.join(','));
               core.exportVariable('DOCKER_IMAGE_DESCRIPTION', docker.image.description);
               core.exportVariable('DOCKER_IMAGE_ARGUMENTS', arguments.join("\r\n"));
-              core.exportVariable('DOCKER_IMAGE_DOCKERFILE', opt.input?.dockerfile || 'arch.dockerfile');
+              core.exportVariable('DOCKER_IMAGE_DOCKERFILE', opt.input?.etc?.dockerfile || 'arch.dockerfile');
 
-              core.exportVariable('WORKFLOW_CREATE_RELEASE', (opt.input?.release || true));
-              core.exportVariable('WORKFLOW_CREATE_README', (opt.input?.readme || true));
-              core.exportVariable('WORKFLOW_GRYPE_FAIL_ON_SEVERITY', (opt.json?.grpye?.fail || true));
-              core.exportVariable('WORKFLOW_GRYPE_SEVERITY_CUTOFF', (opt.json?.grpye?.severity || 'high'));
+              core.exportVariable('WORKFLOW_CREATE_RELEASE', (opt.input?.release === undefined) ? false : opt.input.release);
+              core.exportVariable('WORKFLOW_CREATE_README', (opt.input?.readme === undefined) ? false : opt.input.readme);
+              core.exportVariable('WORKFLOW_GRYPE_FAIL_ON_SEVERITY', (opt.dot?.grype?.fail === undefined) ? true : opt.dot.grype.fail);
+              core.exportVariable('WORKFLOW_GRYPE_SEVERITY_CUTOFF', (opt.dot?.grype?.severity || 'high'));
 
 
 
@@ -230,7 +219,7 @@ jobs:
 
       - name: grype / scan
         id: grype
-        uses: anchore/scan-action@abae793926ec39a78ab18002bc7fc45bbbd94342
+        uses: anchore/scan-action@dc6246fcaf83ae86fcc6010b9824c30d7320729e
         with:
           image: ${{ env.DOCKER_CACHE_GRYPE }}
           fail-build: ${{ env.WORKFLOW_GRYPE_FAIL_ON_SEVERITY }}
@@ -241,7 +230,7 @@ jobs:
 
       - name: grype / fail
         if: failure() || steps.grype.outcome == 'failure'
-        uses: anchore/scan-action@abae793926ec39a78ab18002bc7fc45bbbd94342
+        uses: anchore/scan-action@dc6246fcaf83ae86fcc6010b9824c30d7320729e
         with:
           image: ${{ env.DOCKER_CACHE_GRYPE }}
           fail-build: false
@@ -360,6 +349,30 @@ jobs:
           sarif_file: ${{ steps.grype.outputs.sarif }}
           build_output_metadata: ${{ steps.docker-build.outputs.metadata }}
 
+      - name: docker / push README.md to docker hub
+        continue-on-error: true
+        if: steps.github-readme.outcome == 'success' && hashFiles('README_NONGITHUB.md') != ''
+        uses: christian-korneck/update-container-description-action@d36005551adeaba9698d8d67a296bd16fa91f8e8
+        env:
+          DOCKER_USER: 11notes
+          DOCKER_PASS: ${{ secrets.DOCKER_TOKEN }}
+        with:
+          destination_container_repo: ${{ env.DOCKER_IMAGE_NAME }}
+          provider: dockerhub
+          short_description: ${{ env.DOCKER_IMAGE_DESCRIPTION }}
+          readme_file: 'README_NONGITHUB.md'
+
+      - name: quay / push README.md to quay
+        continue-on-error: true
+        if: steps.github-readme.outcome == 'success' && hashFiles('README_NONGITHUB.md') != ''
+        uses: christian-korneck/update-container-description-action@d36005551adeaba9698d8d67a296bd16fa91f8e8
+        env:
+          DOCKER_APIKEY: ${{ secrets.QUAY_TOKEN }}
+        with:
+          destination_container_repo: quay.io/${{ env.DOCKER_IMAGE_NAME }}
+          provider: quay
+          readme_file: 'README_NONGITHUB.md'
+
       - name: github / commit & push
         continue-on-error: true
         if: steps.github-readme.outcome == 'success' && hashFiles('README.md') != ''
@@ -375,19 +388,6 @@ jobs:
           fi
           git commit -m "auto update README.md"
           git push
-
-      - name: docker / push README.md to docker hub
-        continue-on-error: true
-        if: steps.github-readme.outcome == 'success' && hashFiles('README_DOCKER.md') != ''
-        uses: christian-korneck/update-container-description-action@d36005551adeaba9698d8d67a296bd16fa91f8e8
-        env:
-          DOCKER_USER: 11notes
-          DOCKER_PASS: ${{ secrets.DOCKER_TOKEN }}
-        with:
-          destination_container_repo: ${{ env.DOCKER_IMAGE_NAME }}
-          provider: dockerhub
-          short_description: ${{ env.DOCKER_IMAGE_DESCRIPTION }}
-          readme_file: 'README_DOCKER.md'
 
 
 
