@@ -118,9 +118,9 @@
   VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
 
 # :: Monitor
-  HEALTHCHECK --interval=5s --timeout=2s CMD ["dnslookup", ".", "NS",  "127.0.0.1"]
+  HEALTHCHECK --interval=5s --timeout=2s CMD ["/usr/local/bin/dnslookup", ".", "NS",  "127.0.0.1"]
 
 # :: Start
   USER 1000
-  ENTRYPOINT ["AdGuardHome"]
+  ENTRYPOINT ["/usr/local/bin/AdGuardHome"]
   CMD ["-c", "/adguard/etc/config.yaml", "--pidfile", "/adguard/run/adguard.pid", "--work-dir", "/adguard/var", "--no-check-update"]
