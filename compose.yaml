@@ -11,7 +11,7 @@ services:
     ports:
       - "53:53/udp"
       - "53:53/tcp"
-      - "8443:8443/tcp"
+      - "3000:3000/tcp"
     networks:
       frontend:
     sysctls:

@@ -30,7 +30,6 @@
       zip \
       tar \
       yarn \
-      openssl \
       upx;
 
   RUN set -ex; \
@@ -55,12 +54,7 @@
 
   RUN set -ex; \
     mkdir -p /distroless/usr/local/bin; \
-    mkdir -p /distroless/${APP_ROOT}/etc/ssl; \
     mkdir -p /distroless/${APP_ROOT}/opt; \
-    openssl req -x509 -newkey rsa:4096 -subj "/C=XX/ST=XX/L=XX/O=XX/OU=docker/CN=adguard" \
-      -keyout "/distroless/${APP_ROOT}/etc/ssl/default.key" \
-      -out "/distroless/${APP_ROOT}/etc/ssl/default.crt" \
-      -days 3650 -nodes -sha256 &> /dev/null; \
     eleven strip ${BUILD_BIN}; \
     cp ${BUILD_BIN} /distroless/usr/local/bin;
 

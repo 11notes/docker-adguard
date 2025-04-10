@@ -27,14 +27,7 @@ users:
 auth_attempts: 3
 block_auth_min: 60
 tls:
-  enabled: true
-  server_name: ""
-  force_https: true
-  port_https: 8443
-  certificate_chain: ""
-  private_key: ""
-  certificate_path: /adguard/etc/ssl/default.crt
-  private_key_path: /adguard/etc/ssl/default.key
+  enabled: false
 filtering:
   blocking_mode: nxdomain
   cache_time: 1440

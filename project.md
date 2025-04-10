@@ -51,5 +51,4 @@ ${{ content_tips }}
 
 ${{ title_caution }}
 ${{ github:> [!CAUTION] }}
-${{ github:> }}* This image comes with a default SSL certificate. If you plan to expose the web interface via HTTPS, please replace the default certificate with your own.
 ${{ github:> }}* This image comes with a default configuration with a default password for the admin account. Please set your own password or provide your own configuration.
