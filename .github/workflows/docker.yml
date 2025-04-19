@@ -178,7 +178,7 @@ jobs:
               if(opt.dot?.readme?.comparison){
                 core.exportVariable('WORKFLOW_CREATE_COMPARISON', true);
                 core.exportVariable('WORKFLOW_CREATE_COMPARISON_FOREIGN_IMAGE', opt.dot.readme.comparison.image);
-                core.exportVariable('WORKFLOW_CREATE_COMPARISON_IMAGE', `${docker.image.name}:${docker.app.version}`;
+                core.exportVariable('WORKFLOW_CREATE_COMPARISON_IMAGE', `${docker.image.name}:${docker.app.version}`);
               }
 
 
