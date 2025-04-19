@@ -176,8 +176,8 @@ jobs:
               core.exportVariable('WORKFLOW_GRYPE_FAIL_ON_SEVERITY', (opt.dot?.grype?.fail === undefined) ? true : opt.dot.grype.fail);
               core.exportVariable('WORKFLOW_GRYPE_SEVERITY_CUTOFF', (opt.dot?.grype?.severity || 'high'));
               if(opt.dot?.readme?.comparison){
-                core.exportVariable('WORKFLOW_CREATE_COMPARISON', true;
-                core.exportVariable('WORKFLOW_CREATE_COMPARISON_FOREIGN_IMAGE', opt.dot.readme.comparison.image;
+                core.exportVariable('WORKFLOW_CREATE_COMPARISON', true);
+                core.exportVariable('WORKFLOW_CREATE_COMPARISON_FOREIGN_IMAGE', opt.dot.readme.comparison.image);
                 core.exportVariable('WORKFLOW_CREATE_COMPARISON_IMAGE', `${docker.image.name}:${docker.app.version}`;
               }
 
