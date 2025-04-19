@@ -149,6 +149,11 @@ jobs:
               }
 
             // setup build arguments
+              if(opt.input?.etc?.build?.args){
+                for(const arg in opt.input.etc.build.args){
+                  docker.app[arg] = opt.input.etc.build.args[arg];
+                }
+              }
               const arguments = [];
               for(const argument in docker.app){
                 arguments.push(`APP_${argument.toUpperCase()}=${docker.app[argument]}`);
