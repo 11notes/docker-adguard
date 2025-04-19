@@ -20,6 +20,10 @@
         "11notes/distroless",
         "11notes/distroless:dnslookup"
       ]
+    },
+    "comparison":{
+      "image":"adguard/adguardhome",
+      "tag":"v0.107.59"
     }
   }
 }
