@@ -8,6 +8,9 @@ services:
     volumes:
       - "etc:/adguard/etc"
       - "var:/adguard/var"
+    tmpfs:
+      # tmpfs volume because of read_only: true
+      - "/adguard/run:uid=1000,gid=1000"
     ports:
       - "53:53/udp"
       - "53:53/tcp"
@@ -15,6 +18,7 @@ services:
     networks:
       frontend:
     sysctls:
+      # allow rootless container to access ports < 1024
       net.ipv4.ip_unprivileged_port_start: 53
     restart: "always"
 
