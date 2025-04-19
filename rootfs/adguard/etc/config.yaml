@@ -26,8 +26,6 @@ users:
     password: $2b$12$xzIFiVMrq2jv5NH5pNNQSuEK84FDNI4PoiJbKIhZqUe1Ld/v1BI9W
 auth_attempts: 3
 block_auth_min: 60
-tls:
-  enabled: false
 filtering:
   blocking_mode: nxdomain
   cache_time: 1440
