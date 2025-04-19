@@ -13,4 +13,4 @@ jobs:
           workflow: docker.yml
           wait-for-completion: false
           token: "${{ secrets.REPOSITORY_TOKEN }}"
-          inputs: '{ "runs-on":"self-hosted", "release":"true", "readme":"true" }'
+          inputs: '{ "release":"true", "readme":"true" }'
