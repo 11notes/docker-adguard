@@ -229,6 +229,7 @@ echo "$platforms" | while read -r os arch arm mips; do
 	case "$arch" in
 	arm)
 		dir="AdGuardHome_${os}_${arch}v${arm}"
+    ar="$dir"
 		;;
 	mips*)
 		dir="AdGuardHome_${os}_${arch}v${mips}"
