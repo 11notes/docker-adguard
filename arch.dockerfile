@@ -1,14 +1,19 @@
+ARG APP_UID=1000
+ARG APP_GID=1000
+
 # :: Util
   FROM 11notes/util AS util
 
 # :: Build / adguard
   FROM golang:1.24-alpine AS build
   ARG TARGETARCH
+  ARG TARGETPLATFORM
+  ARG TARGETVARIANT
   ARG APP_ROOT
   ARG APP_VERSION
   ENV CGO_ENABLED=0
   ENV BUILD_DIR=/go/AdGuardHome
-  ENV BUILD_BIN=${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}/AdGuardHome/AdGuardHome
+  ENV BUILD_BIN=${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}${TARGETVARIANT}/AdGuardHome/AdGuardHome
 
   USER root
 
@@ -43,14 +48,15 @@
 
   RUN set -ex; \
     cd ${BUILD_DIR}; \
+    eleven printenv; \
     make \
-      build-release \
+      OS=linux \
+      ARCH=${TARGETARCH} \
       CHANNEL="release" \
       VERSION=${APP_VERSION} \
-      ARCH=${TARGETARCH} \
-      OS=linux \
       SIGN=0 \
-      VERBOSE=2;
+      VERBOSE=3 \
+      build-release;
 
   RUN set -ex; \
     mkdir -p /distroless/usr/local/bin; \
@@ -103,10 +109,10 @@
     ENV APP_ROOT=${APP_ROOT}
 
   # :: multi-stage
-    COPY --from=distroless --chown=1000:1000 / /
-    COPY --from=distroless-fs --chown=1000:1000 / /
-    COPY --from=distroless-dnslookup --chown=1000:1000 / /
-    COPY --from=distroless-adguard --chown=1000:1000 / /
+    COPY --from=distroless --chown=${APP_UID}:${APP_GID} / /
+    COPY --from=distroless-fs --chown=${APP_UID}:${APP_GID} / /
+    COPY --from=distroless-dnslookup --chown=${APP_UID}:${APP_GID} / /
+    COPY --from=distroless-adguard --chown=${APP_UID}:${APP_GID} / /
 
 # :: Volumes
   VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
@@ -115,6 +121,6 @@
   HEALTHCHECK --interval=5s --timeout=2s CMD ["/usr/local/bin/dnslookup", ".", "NS",  "127.0.0.1"]
 
 # :: Start
-  USER 1000
+  USER ${APP_UID}:${APP_GID}
   ENTRYPOINT ["/usr/local/bin/AdGuardHome"]
   CMD ["-c", "/adguard/etc/config.yaml", "--pidfile", "/adguard/run/adguard.pid", "--work-dir", "/adguard/var", "--no-check-update"]
