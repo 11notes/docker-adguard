@@ -3,14 +3,7 @@
 # ADGUARD
 [<img src="https://img.shields.io/badge/github-source-blue?logo=github&color=040308">](https://github.com/11notes/docker-ADGUARD)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.59?color=0eb305)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![version](https://img.shields.io/docker/v/11notes/adguard/0.107.59?color=eb7a09)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)[<img src="https://img.shields.io/github/issues/11notes/docker-ADGUARD?color=7842f5">](https://github.com/11notes/docker-ADGUARD/issues)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![swiss_made](https://img.shields.io/badge/Swiss_Made-FFFFFF?labelColor=FF0000&logo=data:image/svg%2bxml;base64,PHN2ZyB2ZXJzaW9uPSIxIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0wIDBoMzJ2MzJoLTMyeiIgZmlsbD0iI2YwMCIvPjxwYXRoIGQ9Im0xMyA2aDZ2N2g3djZoLTd2N2gtNnYtN2gtN3YtNmg3eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==)
 
-AdGuardHome: rootless, distroless, secure by default
-
-# MAIN TAGS 🏷️
-These are the main tags for the image. There is also a tag for each commit and its shorthand sha256 value.
-
-* [0.107.59](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.59)
-* [stable](https://hub.docker.com/r/11notes/adguard/tags?name=stable)
-* [latest](https://hub.docker.com/r/11notes/adguard/tags?name=latest)
+Run AdGuardHome rootless, distroless and secure by default
 
 # SYNOPSIS 📖
 **What can I do with this?** Block most ads from most websites, have entire categories blocked on your or other networks or for individual clients. Perfect for parents and enterprises alike.
@@ -59,15 +52,6 @@ users:
     password: $2b$12$xzIFiVMrq2jv5NH5pNNQSuEK84FDNI4PoiJbKIhZqUe1Ld/v1BI9W
 auth_attempts: 3
 block_auth_min: 60
-tls:
-  enabled: true
-  server_name: ""
-  force_https: true
-  port_https: 8443
-  certificate_chain: ""
-  private_key: ""
-  certificate_path: /adguard/etc/ssl/default.crt
-  private_key_path: /adguard/etc/ssl/default.key
 filtering:
   blocking_mode: nxdomain
   cache_time: 1440
@@ -121,13 +105,17 @@ services:
     volumes:
       - "etc:/adguard/etc"
       - "var:/adguard/var"
+    tmpfs:
+      # tmpfs volume because of read_only: true
+      - "/adguard/run:uid=1000,gid=1000"
     ports:
       - "53:53/udp"
       - "53:53/tcp"
-      - "8443:8443/tcp"
+      - "3000:3000/tcp"
     networks:
       frontend:
     sysctls:
+      # allow rootless container to access ports < 1024
       net.ipv4.ip_unprivileged_port_start: 53
     restart: "always"
 
@@ -154,6 +142,22 @@ networks:
 | `TZ` | [Time Zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) | |
 | `DEBUG` | Will activate debug option for container image and app (if available) | |
 
+# MAIN TAGS 🏷️
+These are the main tags for the image. There is also a tag for each commit and its shorthand sha256 value.
+
+* [0.107.59](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.59)
+* [stable](https://hub.docker.com/r/11notes/adguard/tags?name=stable)
+
+### There is no latest tag, what am I supposed to do about updates?
+It is of my opinion that the ```:latest``` tag is super dangerous. Many times, I’ve introduced **breaking** changes to my images. This would have messed up everything for some people. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.59``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version.
+
+# REGISTRIES ☁️
+```
+docker pull 11notes/adguard:0.107.59
+docker pull ghcr.io/11notes/adguard:0.107.59
+docker pull quay.io/11notes/adguard:0.107.59
+```
+
 # SOURCE 💾
 * [11notes/adguard](https://github.com/11notes/docker-ADGUARD)
 
@@ -174,10 +178,9 @@ networks:
 
 # CAUTION ⚠️
 > [!CAUTION]
->* This image comes with a default SSL certificate. If you plan to expose the web interface via HTTPS, please replace the default certificate with your own.
 >* This image comes with a default configuration with a default password for the admin account. Please set your own password or provide your own configuration.
 
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 31.03.2025, 21:34:52 (CET)*
+*created 01.05.2025, 07:54:34 (CET)*
