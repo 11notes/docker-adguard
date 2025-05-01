@@ -6,12 +6,11 @@
   
   "semver":{
     "version":"0.107.59",
-    "stable":"0.107.59",
-    "latest":"0.107.59"
+    "stable":"0.107.59"
   },
 
   "readme":{
-    "description":"AdGuardHome: rootless, distroless, secure by default",
+    "description":"Run AdGuardHome rootless, distroless and secure by default",
     "built":{
       "AdGuardHome":"https://github.com/AdguardTeam/AdGuardHome"
     },
@@ -22,8 +21,7 @@
       ]
     },
     "comparison":{
-      "image":"adguard/adguardhome",
-      "tag":"v0.107.59"
+      "image":"adguard/adguardhome:v0.107.59"
     }
   }
 }
