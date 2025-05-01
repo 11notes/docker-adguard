@@ -10,8 +10,11 @@ ${{ github:> }}* This image is created via a secure, pinned CI/CD process and im
 ${{ github:> }}* This image contains a patch to run rootless (Linux caps needed), most other images require higher caps
 ${{ github:> }}* This image contains a proper health check that verifies the app is actually working, most other images have either no health check or only check if a port is open or ping works
 ${{ github:> }}* This image works as read-only, most other images need to write files to the image filesystem
+${{ github:> }}* This image is a lot smaller than most other images
 
 If you value security, simplicity and the ability to interact with the maintainer and developer of an image. Using my images is a great start in that direction.
+
+${{ content_comparison }}
 
 ${{ title_config }}
 ```yaml
