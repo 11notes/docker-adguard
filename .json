@@ -1,27 +1,25 @@
 {
-  "image":"11notes/adguard",
-  "name":"adguard",
-  "root":"/adguard",
-  "arch":"linux/amd64,linux/arm64,linux/arm/v7",
-  
-  "semver":{
-    "version":"0.107.59",
-    "stable":"0.107.59"
+  "image": "11notes/adguard",
+  "name": "adguard",
+  "root": "/adguard",
+  "arch": "linux/amd64,linux/arm64,linux/arm/v7",
+  "semver": {
+    "version": "0.107.61",
+    "stable": "0.107.59"
   },
-
-  "readme":{
-    "description":"Run AdGuardHome rootless, distroless and secure by default",
-    "built":{
-      "AdGuardHome":"https://github.com/AdguardTeam/AdGuardHome"
+  "readme": {
+    "description": "Run AdGuardHome rootless, distroless and secure by default",
+    "built": {
+      "AdGuardHome": "https://github.com/AdguardTeam/AdGuardHome"
     },
-    "distroless":{
-      "layers":[
+    "distroless": {
+      "layers": [
         "11notes/distroless",
         "11notes/distroless:dnslookup"
       ]
     },
-    "comparison":{
-      "image":"adguard/adguardhome:v0.107.59"
+    "comparison": {
+      "image": "adguard/adguardhome:v0.107.61"
     }
   }
 }
