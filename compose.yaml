@@ -1,7 +1,7 @@
 name: "adguard"
 services:
   adguard:
-    image: "11notes/adguard:0.107.61"
+    image: "11notes/adguard:0.107.62"
     read_only: true
     environment:
       TZ: "Europe/Zurich"
