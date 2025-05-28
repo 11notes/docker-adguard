@@ -4,7 +4,7 @@
   "root": "/adguard",
   "arch": "linux/amd64,linux/arm64,linux/arm/v7",
   "semver": {
-    "version": "0.107.61",
+    "version": "0.107.62",
     "stable": "0.107.59"
   },
   "readme": {
@@ -19,7 +19,7 @@
       ]
     },
     "comparison": {
-      "image": "adguard/adguardhome:v0.107.61"
+      "image": "adguard/adguardhome:v0.107.62"
     }
   }
 }
