@@ -19,7 +19,7 @@
       ]
     },
     "comparison": {
-      "image": "adguard/adguardhome:v0.107.61"
+      "image": "adguard/adguardhome:latest"
     }
   }
 }

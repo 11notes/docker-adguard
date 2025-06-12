@@ -118,7 +118,8 @@ ARG APP_GID=1000
   VOLUME ["${APP_ROOT}/etc", "${APP_ROOT}/var"]
 
 # :: Monitor
-  HEALTHCHECK --interval=5s --timeout=2s CMD ["/usr/local/bin/dnslookup", ".", "NS",  "127.0.0.1"]
+  HEALTHCHECK --interval=5s --timeout=2s --start-period=5s \
+    CMD ["/usr/local/bin/dnslookup", ".", "NS",  "127.0.0.1"]
 
 # :: Start
   USER ${APP_UID}:${APP_GID}
