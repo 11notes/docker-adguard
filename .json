@@ -4,11 +4,11 @@
   "root": "/adguard",
   "arch": "linux/amd64,linux/arm64,linux/arm/v7",
   "semver": {
-    "version": "0.107.63",
-    "stable": "0.107.59"
+    "version": "0.107.63"
   },
   "readme": {
-    "description": "Run AdGuardHome rootless, distroless and secure by default",
+    "description": "Run AdGuardHome rootless and distroless.",
+    "introduction": "AdGuard Home is a network-wide software for blocking ads and tracking. After you set it up, it'll cover all your home devices, and you won't need any client-side software for that.",
     "built": {
       "AdGuardHome": "https://github.com/AdguardTeam/AdGuardHome"
     },
