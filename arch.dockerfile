@@ -29,10 +29,19 @@
 
   RUN set -ex; \
     apk --update --no-cache add \
+      curl \
+      wget \
+      unzip \
+      build-base \
+      linux-headers \
       make \
+      cmake \
       g++ \
       git \
       npm \
+      gpg \
+      zip \
+      tar \
       yarn;
 
   RUN set -ex; \
