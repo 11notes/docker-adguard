@@ -79,15 +79,6 @@ jobs:
                 writeFileSync(resolve('.json'), JSON.stringify(repository.dot, null, 2));
                 core.exportVariable('WORKFLOW_AUTO_UPDATE', true);
 
-                const etc = {
-                  build:{
-                    args:{
-                      LIBTORRENT_VERSION :'${{ env.LATEST_LIBTORRENT_VERSION }}',
-                    }
-                  },
-                };
-                core.exportVariable('WORKFLOW_BASE64JSON', Buffer.from(JSON.stringify(etc)).toString('base64'));
-
               }catch(e){
                 core.setFailed(e);
               }
@@ -121,5 +112,5 @@ jobs:
           workflow: docker.yml
           wait-for-completion: false
           token: "${{ secrets.REPOSITORY_TOKEN }}"
-          inputs: '{ "release":"true", "readme":"true", "etc":"${{ env.WORKFLOW_BASE64JSON }}" }'
+          inputs: '{ "release":"true", "readme":"true" }'
           ref: "v${{ env.WORKFLOW_NEW_TAG }}"
