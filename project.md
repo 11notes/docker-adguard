@@ -5,6 +5,7 @@ ${{ content_uvp }} Good question! Because ...
 ${{ github:> [!IMPORTANT] }}
 ${{ github:> }}* ... this image runs [rootless](https://github.com/11notes/RTFM/blob/main/linux/container/image/rootless.md) as 1000:1000
 ${{ github:> }}* ... this image has no shell since it is [distroless](https://github.com/11notes/RTFM/blob/main/linux/container/image/distroless.md)
+${{ github:> }}* ... this image is auto updated to the latest version via CI/CD
 ${{ github:> }}* ... this image has a health check
 ${{ github:> }}* ... this image runs read-only
 ${{ github:> }}* ... this image is automatically scanned for CVEs before and after publishing
