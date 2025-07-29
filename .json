@@ -4,7 +4,7 @@
   "root": "/adguard",
   "arch": "linux/amd64,linux/arm64,linux/arm/v7",
   "semver": {
-    "version": "0.107.63"
+    "version": "0.107.64"
   },
   "readme": {
     "description": "Run AdGuardHome rootless and distroless.",
