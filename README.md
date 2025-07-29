@@ -1,7 +1,7 @@
 ![banner](https://github.com/11notes/defaults/blob/main/static/img/banner.png?raw=true)
 
 # ADGUARD
-![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.63?color=0eb305)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![version](https://img.shields.io/docker/v/11notes/adguard/0.107.63?color=eb7a09)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)[<img src="https://img.shields.io/github/issues/11notes/docker-ADGUARD?color=7842f5">](https://github.com/11notes/docker-ADGUARD/issues)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![swiss_made](https://img.shields.io/badge/Swiss_Made-FFFFFF?labelColor=FF0000&logo=data:image/svg%2bxml;base64,PHN2ZyB2ZXJzaW9uPSIxIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0idHJhbnNwYXJlbnQiLz4KICA8cGF0aCBkPSJtMTMgNmg2djdoN3Y2aC03djdoLTZ2LTdoLTd2LTZoN3oiIGZpbGw9IiNmZmYiLz4KPC9zdmc+)
+![size](https://img.shields.io/docker/image-size/11notes/adguard/0.107.64?color=0eb305)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![version](https://img.shields.io/docker/v/11notes/adguard/0.107.64?color=eb7a09)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)[<img src="https://img.shields.io/github/issues/11notes/docker-ADGUARD?color=7842f5">](https://github.com/11notes/docker-ADGUARD/issues)![5px](https://github.com/11notes/defaults/blob/main/static/img/transparent5x2px.png?raw=true)![swiss_made](https://img.shields.io/badge/Swiss_Made-FFFFFF?labelColor=FF0000&logo=data:image/svg%2bxml;base64,PHN2ZyB2ZXJzaW9uPSIxIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0idHJhbnNwYXJlbnQiLz4KICA8cGF0aCBkPSJtMTMgNmg2djdoN3Y2aC03djdoLTZ2LTdoLTd2LTZoN3oiIGZpbGw9IiNmZmYiLz4KPC9zdmc+)
 
 Run AdGuardHome rootless and distroless.
 
@@ -18,6 +18,7 @@ AdGuard Home is a network-wide software for blocking ads and tracking. After you
 > [!IMPORTANT]
 >* ... this image runs [rootless](https://github.com/11notes/RTFM/blob/main/linux/container/image/rootless.md) as 1000:1000
 >* ... this image has no shell since it is [distroless](https://github.com/11notes/RTFM/blob/main/linux/container/image/distroless.md)
+>* ... this image is auto updated to the latest version via CI/CD
 >* ... this image has a health check
 >* ... this image runs read-only
 >* ... this image is automatically scanned for CVEs before and after publishing
@@ -29,9 +30,9 @@ If you value security, simplicity and optimizations to the extreme, then this im
 # COMPARISON 🏁
 Below you find a comparison between this image and the most used or original one.
 
-| **image** | 11notes/adguard:0.107.63 | adguard/adguardhome:latest |
+| **image** | 11notes/adguard:0.107.64 | adguard/adguardhome:latest |
 | ---: | :---: | :---: |
-| **image size on disk** | 15.2MB | 74.2MB |
+| **image size on disk** | 11.4MB | 74.1MB |
 | **process UID/GID** | 1000/1000 | 0/0 |
 | **distroless?** | ✅ | ❌ |
 | **rootless?** | ✅ | ❌ |
@@ -113,7 +114,7 @@ clients:
 name: "adguard"
 services:
   adguard:
-    image: "11notes/adguard:0.107.63"
+    image: "11notes/adguard:0.107.64"
     read_only: true
     environment:
       TZ: "Europe/Zurich"
@@ -160,18 +161,18 @@ networks:
 # MAIN TAGS 🏷️
 These are the main tags for the image. There is also a tag for each commit and its shorthand sha256 value.
 
-* [0.107.63](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.63)
+* [0.107.64](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.64)
 
 ### There is no latest tag, what am I supposed to do about updates?
-It is of my opinion that the ```:latest``` tag is dangerous. Many times, I’ve introduced **breaking** changes to my images. This would have messed up everything for some people. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.63``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version.
+It is of my opinion that the ```:latest``` tag is dangerous. Many times, I’ve introduced **breaking** changes to my images. This would have messed up everything for some people. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.64``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version.
 
 If you still insist on having the bleeding edge release of this app, simply use the ```:rolling``` tag, but be warned! You will get the latest version of the app instantly, regardless of breaking changes or security issues or what so ever. You do this at your own risk!
 
 # REGISTRIES ☁️
 ```
-docker pull 11notes/adguard:0.107.63
-docker pull ghcr.io/11notes/adguard:0.107.63
-docker pull quay.io/11notes/adguard:0.107.63
+docker pull 11notes/adguard:0.107.64
+docker pull ghcr.io/11notes/adguard:0.107.64
+docker pull quay.io/11notes/adguard:0.107.64
 ```
 
 # SOURCE 💾
@@ -182,7 +183,7 @@ docker pull quay.io/11notes/adguard:0.107.63
 >This image is not based on another image but uses [scratch](https://hub.docker.com/_/scratch) as the starting layer.
 >The image consists of the following distroless layers that were added:
 >* [11notes/distroless](https://github.com/11notes/docker-distroless/blob/master/arch.dockerfile) - contains users, timezones and Root CA certificates
->* [11notes/distroless:dnslookup](https://github.com/11notes/docker-distroless/blob/master/dnslookup.dockerfile) - app to execute DNS queries
+>* [11notes/distroless:dnslookup](https://github.com/11notes/docker-distroless/blob/master/dnslookup.dockerfile) - app to execute DNS lookups
 
 # BUILT WITH 🧰
 * [AdGuardHome](https://github.com/AdguardTeam/AdGuardHome)
@@ -199,4 +200,4 @@ docker pull quay.io/11notes/adguard:0.107.63
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 04.07.2025, 14:27:10 (CET)*
+*created 29.07.2025, 09:05:40 (CET)*
