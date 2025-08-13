@@ -18,7 +18,7 @@
       ]
     },
     "comparison": {
-      "image": "adguard/adguardhome:latest"
+      "image": "adguard/adguardhome"
     }
   }
 }
