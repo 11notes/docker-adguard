@@ -1,31 +1,28 @@
 # ╔═════════════════════════════════════════════════════╗
 # ║                       SETUP                         ║
 # ╚═════════════════════════════════════════════════════╝
-  # GLOBAL
+# GLOBAL
   ARG APP_UID=1000 \
-      APP_GID=1000
+      APP_GID=1000 \
+      BUILD_ROOT=/go/AdGuardHome \
+      BUILD_SRC=AdguardTeam/AdGuardHome.git
 
-  # :: FOREIGN IMAGES
+# :: FOREIGN IMAGES
   FROM 11notes/distroless AS distroless
   FROM 11notes/distroless:dnslookup AS distroless-dnslookup
-  FROM 11notes/util:bin AS util-bin
 
 # ╔═════════════════════════════════════════════════════╗
 # ║                       BUILD                         ║
 # ╚═════════════════════════════════════════════════════╝
 # :: ADGUARD
-  FROM golang:1.24-alpine AS build
-  COPY --from=util-bin / /
+  FROM 11notes/go:1.24 AS build
   ARG APP_VERSION \
       BUILD_ROOT \
-      BUILD_BIN \
+      BUILD_SRC \
       TARGETARCH \
       TARGETPLATFORM \
-      TARGETVARIANT \
-      BUILD_DIR=/go/AdGuardHome \
-      CGO_ENABLED=0
-
-  ENV BUILD_BIN=${BUILD_DIR}/dist/AdGuardHome_linux_${TARGETARCH}${TARGETVARIANT}/AdGuardHome/AdGuardHome
+      TARGETVARIANT
+  ARG BUILD_BIN=${BUILD_ROOT}/dist/AdGuardHome_linux_${TARGETARCH}${TARGETVARIANT}/AdGuardHome/AdGuardHome
 
   RUN set -ex; \
     apk --update --no-cache add \
@@ -45,17 +42,17 @@
       yarn;
 
   RUN set -ex; \
-    git clone https://github.com/AdguardTeam/AdGuardHome.git -b v${APP_VERSION};
+    eleven git clone ${BUILD_SRC} v${APP_VERSION};
 
   COPY /build/adguard/go/ /go
 
   RUN set -ex; \
     # fix caps patch
-    cd ${BUILD_DIR}; \
+    cd ${BUILD_ROOT}; \
     git apply --whitespace=fix cap.patch;
 
   RUN set -ex; \
-    cd ${BUILD_DIR}; \
+    cd ${BUILD_ROOT}; \
     make \
       OS=linux \
       ARCH=${TARGETARCH} \
@@ -71,7 +68,6 @@
 # :: FILE SYSTEM
   FROM alpine AS file-system
   ARG APP_ROOT
-  USER root
 
   RUN set -ex; \
     mkdir -p /distroless${APP_ROOT}/etc; \
@@ -82,7 +78,7 @@
 # ╔═════════════════════════════════════════════════════╗
 # ║                       IMAGE                         ║
 # ╚═════════════════════════════════════════════════════╝
-  # :: HEADER
+# :: HEADER
   FROM scratch
 
   # :: default arguments
