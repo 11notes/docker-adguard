@@ -1,13 +1,21 @@
-name: "adguard"
+name: "dns"
+
+x-lockdown: &lockdown
+  # prevents write access to the image itself
+  read_only: true
+  # prevents any process within the container to gain more privileges
+  security_opt:
+    - "no-new-privileges=true"
+
 services:
   adguard:
     image: "11notes/adguard:0.107.64"
-    read_only: true
+    <<: *lockdown
     environment:
       TZ: "Europe/Zurich"
     volumes:
-      - "etc:/adguard/etc"
-      - "var:/adguard/var"
+      - "adguard.etc:/adguard/etc"
+      - "adguard.var:/adguard/var"
     tmpfs:
       # tmpfs volume because of read_only: true
       - "/adguard/run:uid=1000,gid=1000"
@@ -23,8 +31,8 @@ services:
     restart: "always"
 
 volumes:
-  etc:
-  var:
+  adguard.etc:
+  adguard.var:
 
 networks:
   frontend:
