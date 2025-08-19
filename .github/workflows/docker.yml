@@ -501,7 +501,8 @@ jobs:
   # ║                                                     ║
   # ╚═════════════════════════════════════════════════════╝
   merge_platform_images:
-    if: ${{ needs.docker.outputs.WORKFLOW_BUILD }} == 'true'
+    needs: docker
+    if: needs.docker.outputs.WORKFLOW_BUILD == 'true'
     name: merge platform images to a single manifest
     runs-on: ubuntu-latest
     strategy:
@@ -518,8 +519,6 @@ jobs:
       packages: write
       attestations: write
       id-token: write
-
-    needs: docker
 
     steps:
       # ╔═════════════════════════════════════════════════════╗
