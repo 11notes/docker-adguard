@@ -501,7 +501,7 @@ jobs:
   # ║                                                     ║
   # ╚═════════════════════════════════════════════════════╝
   merge_platform_images:
-    if: ${{ github.event.inputs.build }} == 'true'
+    if: ${{ needs.docker.outputs.WORKFLOW_BUILD }} == 'true'
     name: merge platform images to a single manifest
     runs-on: ubuntu-latest
     strategy:
