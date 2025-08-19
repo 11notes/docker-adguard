@@ -31,7 +31,10 @@ If you value security, simplicity and optimizations to the extreme, then this im
 # COMPARISON 🏁
 Below you find a comparison between this image and the most used or original one.
 
-
+| **image** | **size on disk** | **starts default as ([rootless](https://github.com/11notes/RTFM/blob/main/linux/container/image/rootless.md))** | **[distroless](https://github.com/11notes/RTFM/blob/main/linux/container/image/distroless.md)** |
+| ---: | ---: | :---: | :---: |
+| 11notes/adguard:0.107.64 | 10.6MB | 1000:1000 | ✅ |
+| adguard/adguardhome | 74.1MB | 0:0 | ❌ |
 
 # DEFAULT CONFIG 📑
 ```yaml
@@ -207,4 +210,4 @@ This image supports unraid by default. Simply add **-unraid** to any tag and the
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 19.08.2025, 14:26:49 (CET)*
+*created 19.08.2025, 14:53:08 (CET)*
