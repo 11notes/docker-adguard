@@ -30,7 +30,7 @@ If you value security, simplicity and optimizations to the extreme, then this im
 # COMPARISON 🏁
 Below you find a comparison between this image and the most used or original one.
 
-| **image** | 11notes/adguard:0.107.64 | adguard/adguardhome:latest |
+| **image** | 11notes/adguard:0.107.64 | adguard/adguardhome |
 | ---: | :---: | :---: |
 | **image size on disk** | 11.4MB | 74.1MB |
 | **process UID/GID** | 1000/1000 | 0/0 |
@@ -111,16 +111,24 @@ clients:
 
 # COMPOSE ✂️
 ```yaml
-name: "adguard"
+name: "dns"
+
+x-lockdown: &lockdown
+  # prevents write access to the image itself
+  read_only: true
+  # prevents any process within the container to gain more privileges
+  security_opt:
+    - "no-new-privileges=true"
+
 services:
   adguard:
     image: "11notes/adguard:0.107.64"
-    read_only: true
+    <<: *lockdown
     environment:
       TZ: "Europe/Zurich"
     volumes:
-      - "etc:/adguard/etc"
-      - "var:/adguard/var"
+      - "adguard.etc:/adguard/etc"
+      - "adguard.var:/adguard/var"
     tmpfs:
       # tmpfs volume because of read_only: true
       - "/adguard/run:uid=1000,gid=1000"
@@ -136,8 +144,8 @@ services:
     restart: "always"
 
 volumes:
-  etc:
-  var:
+  adguard.etc:
+  adguard.var:
 
 networks:
   frontend:
@@ -162,6 +170,7 @@ networks:
 These are the main tags for the image. There is also a tag for each commit and its shorthand sha256 value.
 
 * [0.107.64](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.64)
+* [0.107.64-unraid](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.64-unraid)
 
 ### There is no latest tag, what am I supposed to do about updates?
 It is of my opinion that the ```:latest``` tag is dangerous. Many times, I’ve introduced **breaking** changes to my images. This would have messed up everything for some people. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.64``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version.
@@ -174,6 +183,9 @@ docker pull 11notes/adguard:0.107.64
 docker pull ghcr.io/11notes/adguard:0.107.64
 docker pull quay.io/11notes/adguard:0.107.64
 ```
+
+# UNRAID VERSION 🟠
+This image supports unraid by default. Simply add **-unraid** to any tag and the image will run as 99:100 instead of 1000:1000 causing no issues on unraid. Enjoy.
 
 # SOURCE 💾
 * [11notes/adguard](https://github.com/11notes/docker-ADGUARD)
@@ -200,4 +212,4 @@ docker pull quay.io/11notes/adguard:0.107.64
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 29.07.2025, 09:05:40 (CET)*
+*created 13.08.2025, 13:54:04 (CET)*
