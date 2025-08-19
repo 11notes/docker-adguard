@@ -24,18 +24,13 @@ AdGuard Home is a network-wide software for blocking ads and tracking. After you
 >* ... this image is automatically scanned for CVEs before and after publishing
 >* ... this image is created via a secure and pinned CI/CD process
 >* ... this image is very small
+>* ... this image is provided as a single manifest for amd64, arm64 and armhf (arm v7)
 
 If you value security, simplicity and optimizations to the extreme, then this image might be for you.
 
 # COMPARISON 🏁
 Below you find a comparison between this image and the most used or original one.
 
-| **image** | 11notes/adguard:0.107.64 | adguard/adguardhome |
-| ---: | :---: | :---: |
-| **image size on disk** | 11.4MB | 74.1MB |
-| **process UID/GID** | 1000/1000 | 0/0 |
-| **distroless?** | ✅ | ❌ |
-| **rootless?** | ✅ | ❌ |
 
 
 # DEFAULT CONFIG 📑
@@ -212,4 +207,4 @@ This image supports unraid by default. Simply add **-unraid** to any tag and the
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 13.08.2025, 13:54:04 (CET)*
+*created 19.08.2025, 11:31:00 (CET)*
