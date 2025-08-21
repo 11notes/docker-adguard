@@ -33,6 +33,7 @@ Below you find a comparison between this image and the most used or original one
 
 | **image** | **size on disk** | **init default as** | **[distroless](https://github.com/11notes/RTFM/blob/main/linux/container/image/distroless.md)** | supported architectures
 | ---: | ---: | :---: | :---: | :---: |
+| 11notes/adguard:0.107.65 | 10MB | 1000:1000 | ✅ | arm64, armv7, amd64 |
 | adguard/adguardhome | 74MB | 0:0 | ❌ | 386, amd64, armv6, armv7, arm64, ppc64le |
 
 # DEFAULT CONFIG 📑
@@ -209,4 +210,4 @@ This image supports unraid by default. Simply add **-unraid** to any tag and the
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 21.08.2025, 07:14:54 (CET)*
+*created 21.08.2025, 07:32:20 (CET)*
