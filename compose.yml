@@ -9,7 +9,7 @@ x-lockdown: &lockdown
 
 services:
   adguard:
-    image: "11notes/adguard:0.107.68"
+    image: "11notes/adguard:0.107.69"
     <<: *lockdown
     environment:
       TZ: "Europe/Zurich"
