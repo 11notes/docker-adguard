@@ -15,7 +15,7 @@
 # ║                       BUILD                         ║
 # ╚═════════════════════════════════════════════════════╝
 # :: ADGUARD
-  FROM 11notes/go:1.24 AS build
+  FROM 11notes/go:1.25 AS build
   ARG APP_VERSION \
       BUILD_ROOT \
       BUILD_SRC \
@@ -47,9 +47,12 @@
   COPY /build/adguard/go/ /go
 
   RUN set -ex; \
-    # fix caps patch
+    # fix caps
     cd ${BUILD_ROOT}; \
-    git apply --whitespace=fix cap.patch;
+    sed -i 's|unix.CAP_NET_BIND_SERVICE,|0,|' ./internal/aghnet/net_linux.go; \
+    sed -i 's|unix.PR_CAP_AMBIENT,|unix.PR_CAPBSET_READ,|' ./internal/aghnet/net_linux.go; \
+    sed -i 's|unix.PR_CAP_AMBIENT_IS_SET,|unix.CAP_NET_BIND_SERVICE,|' ./internal/aghnet/net_linux.go; \
+    go mod tidy;
 
   RUN set -ex; \
     cd ${BUILD_ROOT}; \
