@@ -17,7 +17,7 @@ services:
       - "adguard.etc:/adguard/etc"
       - "adguard.var:/adguard/var"
     tmpfs:
-      # tmpfs volume because of read_only: true
+      # needed for read-only
       - "/adguard/run:uid=1000,gid=1000"
     ports:
       - "53:53/udp"
