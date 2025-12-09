@@ -3,7 +3,7 @@
   "name": "adguard",
   "root": "/adguard",
   "semver": {
-    "version": "0.107.70"
+    "version": "0.107.71"
   },
   "readme": {
     "description": "Run AdGuardHome rootless and distroless.",
