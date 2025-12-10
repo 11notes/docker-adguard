@@ -15,15 +15,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # build default
-      - name: build container image
-        uses: the-actions-org/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7
-        with:
-          workflow: docker.yml
-          wait-for-completion: false
-          token: "${{ secrets.REPOSITORY_TOKEN }}"
-          inputs: '{ "release":"true", "readme":"true", "run-name":"build ${{ github.event.inputs.ref }}" }'
-
       # check if additional builds need to happen
       - name: etc to environment variable
         if: github.event.inputs.etc != 'null'
@@ -36,12 +27,21 @@ jobs:
               try{
                 const etc = JSON.parse(Buffer.from('${{ github.event.inputs.etc }}', 'base64').toString('ascii'));
                 for(const k in etc){
-                  core.exportVariable(`WORKFLOW_ETC_${k.toUpperString()}`, `${etc[k]}`);
+                  core.exportVariable(`WORKFLOW_ETC_${String(k).toUpperCase()}`, `${etc[k]}`);
                 }
               }catch(e){
-                core.setFailed(`could not parse etc: ${{ github.event.inputs.etc }}`);
+                core.setFailed(`could not parse etc: ${e}`);
               }
             })();
+
+      # DEFAULT
+      - name: build container image
+        uses: the-actions-org/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7
+        with:
+          workflow: docker.yml
+          wait-for-completion: false
+          token: "${{ secrets.REPOSITORY_TOKEN }}"
+          inputs: '{ "release":"true", "readme":"true", "run-name":"build ${{ github.event.inputs.ref }}" }'
 
       # UNRAID
       - name: build container image for unraid
