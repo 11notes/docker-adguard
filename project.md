@@ -11,7 +11,6 @@ ${{ github:> }}* ... this image runs read-only
 ${{ github:> }}* ... this image is automatically scanned for CVEs before and after publishing
 ${{ github:> }}* ... this image is created via a secure and pinned CI/CD process
 ${{ github:> }}* ... this image is very small
-${{ github:> }}* ... this image is provided as a single manifest for amd64, arm64 and **armv7**
 
 If you value security, simplicity and optimizations to the extreme, then this image might be for you.
 
