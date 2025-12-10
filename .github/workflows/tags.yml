@@ -7,10 +7,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: setup etc for org.build.yml
+        run: |
+          echo "WORKFLOW_ETC_BASE64JSON=$(echo '{"unraid":true, "nobody":true}' | base64)" >> "${GITHUB_ENV}"
+
       - name: build container images
         uses: the-actions-org/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7
         with:
           workflow: org.build.yml
           wait-for-completion: false
           token: "${{ secrets.REPOSITORY_TOKEN }}"
-          inputs: '{ "ref":"${{ github.ref_name }}", "etc":"eyJ1bnJhaWQiOnRydWUsICJub2JvZHkiOnRydWV9" }'
+          inputs: '{ "ref":"${{ github.ref_name }}", "etc":"${{ env.WORKFLOW_ETC_BASE64JSON }}" }'
