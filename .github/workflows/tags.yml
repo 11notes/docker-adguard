@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: setup etc for org.build.yml
         run: |
-          echo "WORKFLOW_ETC_BASE64JSON=$(echo '{"unraid":true, "nobody":true}' | base64)" >> "${GITHUB_ENV}"
+          echo "WORKFLOW_ETC_BASE64JSON=$(echo '{"unraid":true, "nobody":true}' | base64 -w 0)" >> "${GITHUB_ENV}"
 
       - name: build container images
         uses: the-actions-org/workflow-dispatch@3133c5d135c7dbe4be4f9793872b6ef331b53bc7
