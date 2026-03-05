@@ -11,6 +11,7 @@ ${{ github:> }}* ... this image runs read-only
 ${{ github:> }}* ... this image is automatically scanned for CVEs before and after publishing
 ${{ github:> }}* ... this image is created via a secure and pinned CI/CD process
 ${{ github:> }}* ... this image is very small
+${{ github:> }}* ... this image creates a random password at start if none is set
 
 If you value security, simplicity and optimizations to the extreme, then this image might be for you.
 
@@ -21,7 +22,7 @@ ${{ title_config }}
 ${{ include: ./rootfs/adguard/etc/config.yaml }}
 ```
 
-The default configuration contains no special settings, except ignoring the dnslookup health check in the statistics and as a client to not pollute your UI or statistics. Consider replacing it with your own or start the container with the default one and start changing what you need. The configuration will be updated with your settings if you use the mentioned volumes below. It is recommended to always add the exception for dnslookup.
+The default configuration contains no special settings, except ignoring the dnslookup health check in the statistics and as a client to not pollute your UI or statistics. Consider replacing it with your own or start the container with the default one and start changing what you need. The configuration will be updated with your settings if you use the mentioned volumes below. It is recommended to always add the exception for dnslookup. If using the default config, the container will set a new random password for the user ```admin``` at start and print it to the log **only once**!
 
 ```yaml
 clients:
@@ -40,9 +41,9 @@ ${{ title_volumes }}
 ${{ content_compose }}
 
 ${{ content_defaults }}
-| `login` | admin // adguard | login using default config |
 
 ${{ content_environment }}
+| `ADGUARD_CONFIG` | Will overwrite the default config with the value of this variable if set | |
 
 ${{ content_source }}
 
@@ -51,7 +52,3 @@ ${{ content_parent }}
 ${{ content_built }}
 
 ${{ content_tips }}
-
-${{ title_caution }}
-${{ github:> [!CAUTION] }}
-${{ github:> }}* This image comes with a default configuration with a default password for the admin account. Please set your own password or provide your own configuration.

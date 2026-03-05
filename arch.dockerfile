@@ -4,6 +4,7 @@
 # GLOBAL
   ARG APP_UID=1000 \
       APP_GID=1000 \
+      APP_GO_VERSION=0 \
       BUILD_ROOT=/go/AdGuardHome \
       BUILD_SRC=AdguardTeam/AdGuardHome.git
 
@@ -14,8 +15,16 @@
 # ╔═════════════════════════════════════════════════════╗
 # ║                       BUILD                         ║
 # ╚═════════════════════════════════════════════════════╝
+# :: ENTRYPOINT
+  FROM 11notes/go:${APP_GO_VERSION} AS entrypoint
+  COPY ./build/entrypoint /go/entrypoint
+  RUN set -ex; \
+    cd /go/entrypoint; \
+    eleven go build /entrypoint main.go; \
+    eleven distroless /entrypoint;
+
 # :: ADGUARD
-  FROM 11notes/go:1.25 AS build
+  FROM 11notes/go:${APP_GO_VERSION} AS build
   ARG APP_VERSION \
       BUILD_ROOT \
       BUILD_SRC \
@@ -106,6 +115,7 @@
   # :: multi-stage
     COPY --from=distroless / /
     COPY --from=distroless-dnslookup / /
+    COPY --from=entrypoint /distroless/ /
     COPY --from=build /distroless/ /
     COPY --from=file-system --chown=${APP_UID}:${APP_GID} /distroless/ /
     COPY --chown=${APP_UID}:${APP_GID} ./rootfs/ /
@@ -119,5 +129,4 @@
 
 # :: EXECUTE
   USER ${APP_UID}:${APP_GID}
-  ENTRYPOINT ["/usr/local/bin/AdGuardHome"]
-  CMD ["-c", "/adguard/etc/config.yaml", "--pidfile", "/adguard/run/adguard.pid", "--work-dir", "/adguard/var", "--no-check-update"]
+  ENTRYPOINT ["/usr/local/bin/entrypoint"]
