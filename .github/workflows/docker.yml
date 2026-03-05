@@ -229,16 +229,15 @@ jobs:
             };
 
             try{
-              const response = await fetch('https://api.github.com/repos/openssl/openssl/releases/latest');
+              const response = await fetch('https://raw.githubusercontent.com/11notes/static/refs/heads/main/src/semver/latest.json');
               if(!response.ok){
                 throw new Error(`error fetching OpenSSL version: ${response.status}`);
               }
               const result = await response.json();
-              if(!result?.tag_name){
-                throw new Error(`coult not find tag_name in result: ${result}`);
+              for(const dep in result){
+                docker.app[`${dep}_version`] = `${result[dep]}`;
+                core.info(`setting APP_${String(dep).toUpperCase()}_VERSION to ${result[dep]}`);
               }
-              docker.app.openssl_version = result.tag_name.replace(/openssl-/i, '');
-              core.info(`setting APP_OPENSSL_VERSION to ${docker.app.openssl_version}`);
             }catch(e){
               core.warning(e);
             }
