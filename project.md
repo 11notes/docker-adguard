@@ -44,7 +44,7 @@ ${{ content_compose }}
 ${{ content_defaults }}
 
 ${{ content_environment }}
-| `ADGUARD_CONFIG` | Will overwrite the default config with the value of this variable if set ([inline config](https://github.com/11notes/RTFM/blob/master/linux/container/image/11notes/inline-config.md)) | |
+| `ADGUARD_CONFIG` *(optional)* | Will overwrite the default config with the value of this variable if set ([inline config](https://github.com/11notes/RTFM/blob/master/linux/container/image/11notes/inline-config.md)) | |
 
 ${{ content_source }}
 
