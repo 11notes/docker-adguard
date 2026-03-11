@@ -12,7 +12,7 @@ ${{ github:> }}* ... this image is automatically scanned for CVEs before and aft
 ${{ github:> }}* ... this image is created via a secure and pinned CI/CD process
 ${{ github:> }}* ... this image is very small
 ${{ github:> }}* ... this image creates a random password at start if none is set in the config
-${{ github:> }}* ... this image support [inline configs](https://github.com/11notes/RTFM/blob/master/linux/container/image/11notes/inline-config.md)
+${{ github:> }}* ... this image supports [inline configs](https://github.com/11notes/RTFM/blob/master/linux/container/image/11notes/inline-config.md)
 
 If you value security, simplicity and optimizations to the extreme, then this image might be for you.
 
