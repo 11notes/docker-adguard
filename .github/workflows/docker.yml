@@ -357,6 +357,9 @@ jobs:
                     const file = readFileSync(path).toString();
                     switch(true){
                       case /11notes\/go\:\$\{APP_GO_VERSION\}/ig.test(file): core.exportVariable('WORKFLOW_IMAGE_DEPENDENCY', 'go'); break;
+                      case /11notes\/python\:\$\{APP_PYTHON_VERSION\}/ig.test(file): core.exportVariable('WORKFLOW_IMAGE_DEPENDENCY', 'python'); break;
+                      case /11notes\/php\:\$\{APP_PHP_VERSION\}/ig.test(file): core.exportVariable('WORKFLOW_IMAGE_DEPENDENCY', 'php'); break;
+                      case /11notes\/php-fpm\:\$\{APP_PHP_VERSION\}/ig.test(file): core.exportVariable('WORKFLOW_IMAGE_DEPENDENCY', 'php'); break;
                     }
                   }catch(e){
                     throw new Error(`could not open ./${dockerfile}: ${e}`);

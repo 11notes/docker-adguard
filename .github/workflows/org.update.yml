@@ -61,7 +61,7 @@ jobs:
 
               // defaults
               const json = `${{ toJSON(github.event.inputs) }}`;
-              const job = {inputs:{}, json:{}};
+              const job = {inputs:{}, json:{}, fail:false};
 
               // check if inputs is valid base64 encoded json
               try{
@@ -75,7 +75,8 @@ jobs:
                       }else if(!job.inputs?.tag){
                         core.setFailed(`input does not contain valid git tag: ${inspect(job.inputs, {showHidden:false, depth:null, colors:true})}`);
                       }else if(job.inputs.version == 'null' || null === job.inputs.version){
-                        core.setFailed(`input version is null: ${inspect(job.inputs, {showHidden:false, depth:null, colors:true})}`);
+                        core.warning(`input version is null: ${inspect(job.inputs, {showHidden:false, depth:null, colors:true})}`);
+                        job.fail = true;
                       }
                     }catch(e){
                       core.setFailed(`could not parse github.event.inputs.etc: ${n.etc} (${Buffer.from(n.etc, 'base64').toString('ascii')})`);
@@ -86,77 +87,79 @@ jobs:
                 core.setFailed(`could not parse github.event.inputs: ${json}`);
               }
 
-              // check if .json exists
-              try{
-                const path = resolve('.json');
-                if(existsSync(path)){
-                  try{
-                    job.json = JSON.parse(readFileSync(path).toString());
-                  }catch(e){
-                    throw new Error('could not parse .json');
-                  }
-                }else{
-                  throw new Error('.json does not exist!');
-                }
-              }catch(e){
-                core.setFailed(e);
-              }
-
-              // semver
-              const latest = semverExceptions(semver.valid(semver.coerce(job.inputs.version)));
-              const current = semverExceptions(semver.valid(semver.coerce(job.json.semver.version)));
-              const tag = semver.valid(semver.coerce(job.inputs.tag));
-              const checks = {latestTagExists:false};
-
-              try{
-                const tag = await fetch(`https://hub.docker.com/v2/repositories/${job.json.image}/tags/${latest}`);
-                if(tag.status === 200){
-                  checks.latestTagExists = true;
-                }
-              }catch(e){
-                core.warning(e);
-              }
-
-              // compare
-              if(latest && latest !== current && !checks.latestTagExists){
-                core.info(`new ${semver.diff(current, latest)} release found (${latest}), updating ...`)
-                job.json.semver.version = latest;
-
-                // check if app has additional parameters
-                const build = {};
-                if(job.inputs?.build && typeof(job.inputs.build) === 'string'){
-                  build.args = {
-                    version_build:job.inputs.build,
-                  };
-                  job.json.build.args.version_build = job.inputs.build;
-                }else if(job.inputs?.build?.args){
-                  build.args = job.inputs.build.args;
-                  job.json.build.args.version_build = job.inputs.build.args;
-                }
-
-                // update .json
+              if(!job.fail){
+                // check if .json exists
                 try{
-                  writeFileSync(resolve('.json'), JSON.stringify(job.json, null, 2));
-
-                  // export variables
-                  core.exportVariable('WORKFLOW_UPDATE', true);
-                  core.exportVariable('WORKFLOW_UPDATE_BASE64JSON', Buffer.from(JSON.stringify({build:build})).toString('base64'));
-                  if(job.inputs?.unraid){
-                    core.exportVariable('WORKFLOW_UPDATE_UNRAID', 'true');
-                    core.exportVariable('WORKFLOW_UPDATE_UNRAID_BASE64JSON', Buffer.from(JSON.stringify({semversuffix:"unraid", uid:99, gid:100, build:build})).toString('base64'));
+                  const path = resolve('.json');
+                  if(existsSync(path)){
+                    try{
+                      job.json = JSON.parse(readFileSync(path).toString());
+                    }catch(e){
+                      throw new Error('could not parse .json');
+                    }
+                  }else{
+                    throw new Error('.json does not exist!');
                   }
-                  if(job.inputs?.nobody){
-                    core.exportVariable('WORKFLOW_UPDATE_NOBODY', 'true');
-                    core.exportVariable('WORKFLOW_UPDATE_NOBODY_BASE64JSON', Buffer.from(JSON.stringify({semversuffix:"nobody", uid:65534, gid:65534, build:build})).toString('base64'));
-                  }
-                  core.exportVariable('LATEST_TAG', semver.inc(tag, semver.diff(current, latest)));
-                  core.exportVariable('LATEST_VERSION', latest);
-                  if(job.inputs?.build) core.exportVariable('LATEST_BUILD', job.inputs.build);
                 }catch(e){
                   core.setFailed(e);
                 }
-              }else{
-                core.info('no update required')
+
+                // semver
+                const latest = semverExceptions(semver.valid(semver.coerce(job.inputs.version)));
+                const current = semverExceptions(semver.valid(semver.coerce(job.json.semver.version)));
+                const tag = semver.valid(semver.coerce(job.inputs.tag));
+                const checks = {latestTagExists:false};
+
+                try{
+                  const tag = await fetch(`https://hub.docker.com/v2/repositories/${job.json.image}/tags/${latest}`);
+                  if(tag.status === 200){
+                    checks.latestTagExists = true;
+                  }
+                }catch(e){
+                  core.warning(e);
+                }
+
+                // compare
+                if(latest && latest !== current && !checks.latestTagExists){
+                  core.info(`new ${semver.diff(current, latest)} release found (${latest}), updating ...`)
+                  job.json.semver.version = latest;
+
+                  // check if app has additional parameters
+                  const build = {};
+                  if(job.inputs?.build && typeof(job.inputs.build) === 'string'){
+                    build.args = {
+                      version_build:job.inputs.build,
+                    };
+                    job.json.build.args.version_build = job.inputs.build;
+                  }else if(job.inputs?.build?.args){
+                    build.args = job.inputs.build.args;
+                    job.json.build.args.version_build = job.inputs.build.args;
+                  }
+
+                  // update .json
+                  try{
+                    writeFileSync(resolve('.json'), JSON.stringify(job.json, null, 2));
+
+                    // export variables
+                    core.exportVariable('WORKFLOW_UPDATE', true);
+                    core.exportVariable('WORKFLOW_UPDATE_BASE64JSON', Buffer.from(JSON.stringify({build:build})).toString('base64'));
+                    if(job.inputs?.unraid){
+                      core.exportVariable('WORKFLOW_UPDATE_UNRAID', 'true');
+                      core.exportVariable('WORKFLOW_UPDATE_UNRAID_BASE64JSON', Buffer.from(JSON.stringify({semversuffix:"unraid", uid:99, gid:100, build:build})).toString('base64'));
+                    }
+                    if(job.inputs?.nobody){
+                      core.exportVariable('WORKFLOW_UPDATE_NOBODY', 'true');
+                      core.exportVariable('WORKFLOW_UPDATE_NOBODY_BASE64JSON', Buffer.from(JSON.stringify({semversuffix:"nobody", uid:65534, gid:65534, build:build})).toString('base64'));
+                    }
+                    core.exportVariable('LATEST_TAG', semver.inc(tag, semver.diff(current, latest)));
+                    core.exportVariable('LATEST_VERSION', latest);
+                    if(job.inputs?.build) core.exportVariable('LATEST_BUILD', job.inputs.build);
+                  }catch(e){
+                    core.setFailed(e);
+                  }
+                }else{
+                  core.info('no update required')
+                }
               }
 
               core.info(inspect(job, {showHidden:false, depth:null, colors:true}));
