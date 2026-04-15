@@ -266,7 +266,9 @@ jobs:
             docker.app.prefix = docker.image.prefix;
             docker.app.suffix = docker.image.suffix;
 
-            const semver = docker.app.version.split('.');
+            const semver = (
+              (/stable|latest/i.test(docker.app.version)) ? [] : docker.app.version.split('.')
+            );
             // setup tags
               if(!opt.dot?.semver?.disable?.rolling && !opt.input.etc?.semver?.disable?.rolling){
                 docker.image.tags.push('rolling');
