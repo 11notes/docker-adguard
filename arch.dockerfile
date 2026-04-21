@@ -4,13 +4,16 @@
 # GLOBAL
   ARG APP_UID=1000 \
       APP_GID=1000 \
-      APP_GO_VERSION=0 \
-      BUILD_ROOT=/go/AdGuardHome \
+      APP_GO_VERSION=0
+
+# APP
+  ARG BUILD_ROOT=/go/AdGuardHome \
       BUILD_SRC=AdguardTeam/AdGuardHome.git
 
 # :: FOREIGN IMAGES
   FROM 11notes/distroless AS distroless
   FROM 11notes/distroless:dnslookup AS distroless-dnslookup
+
 
 # ╔═════════════════════════════════════════════════════╗
 # ║                       BUILD                         ║
@@ -52,6 +55,10 @@
 
   RUN set -ex; \
     eleven git clone ${BUILD_SRC} v${APP_VERSION};
+
+  RUN set -eux; \
+    cd ${BUILD_ROOT}; \
+    eleven go patch github.com/quic-go/quic-go v0.57.0 CVE-2025-64702;
 
   COPY /build/adguard/go/ /go
 
@@ -108,9 +115,9 @@
 
   # :: default environment
     ENV APP_IMAGE=${APP_IMAGE} \
-      APP_NAME=${APP_NAME} \
-      APP_VERSION=${APP_VERSION} \
-      APP_ROOT=${APP_ROOT}
+        APP_NAME=${APP_NAME} \
+        APP_VERSION=${APP_VERSION} \
+        APP_ROOT=${APP_ROOT}
 
   # :: multi-stage
     COPY --from=distroless / /
