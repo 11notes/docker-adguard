@@ -26,8 +26,8 @@ services:
       # needed for read-only
       - "/adguard/run:uid=1000,gid=1000"
     ports:
-      - "53:53/udp"
-      - "53:53/tcp"
+      - "3053:53/udp"
+      - "3053:53/tcp"
       - "3000:3000/tcp"
     networks:
       frontend:
