@@ -3,7 +3,7 @@
 # ADGUARD
 ![size](https://img.shields.io/badge/image_size-17MB-green?color=%2338ad2d)![5px](https://raw.githubusercontent.com/11notes/static/refs/heads/master/img/markdown/transparent5x2px.png)![pulls](https://img.shields.io/docker/pulls/11notes/adguard?color=2b75d6)![5px](https://raw.githubusercontent.com/11notes/static/refs/heads/master/img/markdown/transparent5x2px.png)[<img src="https://img.shields.io/github/issues/11notes/docker-adguard?color=7842f5">](https://github.com/11notes/docker-adguard/issues)![5px](https://raw.githubusercontent.com/11notes/static/refs/heads/master/img/markdown/transparent5x2px.png)![swiss_made](https://img.shields.io/badge/Swiss_Made-FFFFFF?labelColor=FF0000&logo=data:image/svg%2bxml;base64,PHN2ZyB2ZXJzaW9uPSIxIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDMyIDMyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0idHJhbnNwYXJlbnQiLz4KICA8cGF0aCBkPSJtMTMgNmg2djdoN3Y2aC03djdoLTZ2LTdoLTd2LTZoN3oiIGZpbGw9IiNmZmYiLz4KPC9zdmc+)
 
-run AdGuardHome rootless and distroless.
+Run AdGuardHome rootless and distroless.
 
 # INTRODUCTION 📢
 
@@ -23,6 +23,7 @@ AdGuard Home is a network-wide software for blocking ads and tracking. After you
 >* ... this image runs read-only
 >* ... this image is automatically scanned for CVEs before and after publishing
 >* ... this image is created via a secure and pinned CI/CD process
+>* ... this image runs a basic integration test before it will be published (or not if it fails)
 >* ... this image is very small
 >* ... this image creates a random password at start if none is set in the config
 >* ... this image supports [inline configs](https://github.com/11notes/RTFM/blob/master/linux/container/image/11notes/inline-config.md)
@@ -35,7 +36,7 @@ Below you find a comparison between this image and the most used or original one
 | **image** | **size on disk** | **init default as** | **[distroless](https://github.com/11notes/RTFM/blob/main/linux/container/image/distroless.md)** | supported architectures
 | ---: | ---: | :---: | :---: | :---: |
 | 11notes/adguard | 17MB | 1000:1000 | ✅ | amd64, arm64, armv7 |
-| adguard/adguardhome | 77MB | 0:0 | ❌ | 386, amd64, arm64, armv6, armv7, ppc64le |
+| adguard/adguardhome | 78MB | 0:0 | ❌ | 386, amd64, arm64, armv6, armv7, ppc64le |
 
 # DEFAULT CONFIG 📑
 ```yaml
@@ -121,7 +122,7 @@ x-lockdown: &lockdown
 
 services:
   adguard:
-    image: "11notes/adguard:0.107.73"
+    image: "11notes/adguard:0.107.76"
     <<: *lockdown
     environment:
       TZ: "Europe/Zurich"
@@ -169,20 +170,20 @@ To find out how you can change the default UID/GID of this container image, cons
 # MAIN TAGS 🏷️
 These are the main tags for the image. There is also a tag for each commit and its shorthand sha256 value.
 
-* [0.107.73](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.73)
-* [0.107.73-unraid](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.73-unraid)
-* [0.107.73-nobody](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.73-nobody)
+* [0.107.76](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.76)
+* [0.107.76-unraid](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.76-unraid)
+* [0.107.76-nobody](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.76-nobody)
 
 ### There is no latest tag, what am I supposed to do about updates?
-It is my opinion that the ```:latest``` tag is a bad habbit and should not be used at all. Many developers introduce **breaking changes** in new releases. This would messed up everything for people who use ```:latest```. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.73``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version. Which in theory should not introduce breaking changes.
+It is my opinion that the ```:latest``` tag is a bad habbit and should not be used at all. Many developers introduce **breaking changes** in new releases. This would messed up everything for people who use ```:latest```. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.76``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version. Which in theory should not introduce breaking changes.
 
 If you still insist on having the bleeding edge release of this app, simply use the ```:rolling``` tag, but be warned! You will get the latest version of the app instantly, regardless of breaking changes or security issues or what so ever. You do this at your own risk!
 
 # REGISTRIES ☁️
 ```
-docker pull 11notes/adguard:0.107.73
-docker pull ghcr.io/11notes/adguard:0.107.73
-docker pull quay.io/11notes/adguard:0.107.73
+docker pull 11notes/adguard:0.107.76
+docker pull ghcr.io/11notes/adguard:0.107.76
+docker pull quay.io/11notes/adguard:0.107.76
 ```
 
 # UNRAID VERSION 🟠
@@ -212,4 +213,4 @@ This image supports nobody by default. Simply add **-nobody** to any tag and the
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 09.04.2026, 23:15:52 (CET)*
+*created 27.05.2026, 23:24:13 (CET)*
