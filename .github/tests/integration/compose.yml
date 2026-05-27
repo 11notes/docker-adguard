@@ -1,0 +1,44 @@
+name: "integration"
+
+x-lockdown: &lockdown
+  # prevents write access to the image itself
+  read_only: true
+  # prevents any process within the container to gain more privileges
+  security_opt:
+    - "no-new-privileges=true"
+
+services:
+  main:
+    image: "${IMAGE}"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/dnslookup", ".", "NS",  "127.0.0.1"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+      start_period: 30s
+    <<: *lockdown
+    environment:
+      TZ: "Europe/Zurich"
+    volumes:
+      - "adguard.etc:/adguard/etc"
+      - "adguard.var:/adguard/var"
+    tmpfs:
+      # needed for read-only
+      - "/adguard/run:uid=1000,gid=1000"
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "3000:3000/tcp"
+    networks:
+      frontend:
+    sysctls:
+      # allow rootless container to access ports < 1024
+      net.ipv4.ip_unprivileged_port_start: 53
+    restart: "always"
+
+volumes:
+  adguard.etc:
+  adguard.var:
+
+networks:
+  frontend:
