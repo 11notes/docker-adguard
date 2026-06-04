@@ -122,7 +122,7 @@ x-lockdown: &lockdown
 
 services:
   adguard:
-    image: "11notes/adguard:0.107.76"
+    image: "11notes/adguard:0.107.77"
     <<: *lockdown
     environment:
       TZ: "Europe/Zurich"
@@ -170,20 +170,20 @@ To find out how you can change the default UID/GID of this container image, cons
 # MAIN TAGS 🏷️
 These are the main tags for the image. There is also a tag for each commit and its shorthand sha256 value.
 
-* [0.107.76](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.76)
-* [0.107.76-unraid](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.76-unraid)
-* [0.107.76-nobody](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.76-nobody)
+* [0.107.77](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.77)
+* [0.107.77-unraid](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.77-unraid)
+* [0.107.77-nobody](https://hub.docker.com/r/11notes/adguard/tags?name=0.107.77-nobody)
 
 ### There is no latest tag, what am I supposed to do about updates?
-It is my opinion that the ```:latest``` tag is a bad habbit and should not be used at all. Many developers introduce **breaking changes** in new releases. This would messed up everything for people who use ```:latest```. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.76``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version. Which in theory should not introduce breaking changes.
+It is my opinion that the ```:latest``` tag is a bad habbit and should not be used at all. Many developers introduce **breaking changes** in new releases. This would messed up everything for people who use ```:latest```. If you don’t want to change the tag to the latest [semver](https://semver.org/), simply use the short versions of [semver](https://semver.org/). Instead of using ```:0.107.77``` you can use ```:0``` or ```:0.107```. Since on each new version these tags are updated to the latest version of the software, using them is identical to using ```:latest``` but at least fixed to a major or minor version. Which in theory should not introduce breaking changes.
 
 If you still insist on having the bleeding edge release of this app, simply use the ```:rolling``` tag, but be warned! You will get the latest version of the app instantly, regardless of breaking changes or security issues or what so ever. You do this at your own risk!
 
 # REGISTRIES ☁️
 ```
-docker pull 11notes/adguard:0.107.76
-docker pull ghcr.io/11notes/adguard:0.107.76
-docker pull quay.io/11notes/adguard:0.107.76
+docker pull 11notes/adguard:0.107.77
+docker pull ghcr.io/11notes/adguard:0.107.77
+docker pull quay.io/11notes/adguard:0.107.77
 ```
 
 # UNRAID VERSION 🟠
@@ -213,4 +213,4 @@ This image supports nobody by default. Simply add **-nobody** to any tag and the
 # ElevenNotes™️
 This image is provided to you at your own risk. Always make backups before updating an image to a different version. Check the [releases](https://github.com/11notes/docker-adguard/releases) for breaking changes. If you have any problems with using this image simply raise an [issue](https://github.com/11notes/docker-adguard/issues), thanks. If you have a question or inputs please create a new [discussion](https://github.com/11notes/docker-adguard/discussions) instead of an issue. You can find all my other repositories on [github](https://github.com/11notes?tab=repositories).
 
-*created 27.05.2026, 23:24:13 (CET)*
+*created 04.06.2026, 06:03:35 (CET)*
