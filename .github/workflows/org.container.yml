@@ -135,6 +135,7 @@ jobs:
       DOCKER_IMAGE_ARGUMENTS: ${{ steps.setup-environment.outputs.DOCKER_IMAGE_ARGUMENTS }}
       DOCKER_CICD_LATEST: ${{ steps.setup-environment.outputs.DOCKER_CICD_LATEST }}
       WORKFLOW_BUILD: ${{ steps.setup-environment.outputs.WORKFLOW_BUILD }}
+      REGISTRY_QUAY: ${{ steps.setup-environment.outputs.REGISTRY_QUAY }}
 
     timeout-minutes: 1440
 
@@ -164,6 +165,11 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
+
+      # CHECK IF QUAY.IO IS DOWN AGAIN
+      - name: init / check quay.io
+        run: |
+          echo "QUAY_STATUS=$(curl -s https://status.redhat.com/api/v2/components.json | jq -r '.components[] | select(.name | contains("Quay") or contains("quay")) | .status')" >> $GITHUB_ENV
 
       # SETUP NODE JS
       - name: update / setup node
@@ -243,9 +249,21 @@ jobs:
                 registry:'localhost:5000/',
                 enable:(opt.input?.etc?.cache === undefined) ? true : opt.input.etc.cache,
               },
+              registry:{
+                docker:{enabled:true},
+                ghcr:{enabled:true},
+                quay:{enabled:true},
+              },
+              grype:{
+                fail:(opt.input?.etc?.grype?.fail || opt.dot?.grype?.fail)
+              },
               tags:[],
               merge_tags:[],
             };
+
+            if(docker.grype.fail === undefined){
+              docker.grype.fail = false;
+            }
 
             try{
               // wait 2.5s too not trigger 429 from github
@@ -309,7 +327,12 @@ jobs:
               for(const tag of docker.image.tags){
                 docker.tags.push(`${docker.image.name}:${docker.image.prefix}${tag}${docker.image.suffix}-${docker.image.platform.sanitized}`);
                 docker.tags.push(`ghcr.io/${docker.image.name}:${docker.image.prefix}${tag}${docker.image.suffix}-${docker.image.platform.sanitized}`);
-                docker.tags.push(`quay.io/${docker.image.name}:${docker.image.prefix}${tag}${docker.image.suffix}-${docker.image.platform.sanitized}`);
+                if(/operational/i.test(process.env?.QUAY_STATUS)){
+                  core.setOutput('REGISTRY_QUAY', 'true');
+                  docker.tags.push(`quay.io/${docker.image.name}:${docker.image.prefix}${tag}${docker.image.suffix}-${docker.image.platform.sanitized}`);
+                }else{
+                  core.setOutput('REGISTRY_QUAY', 'false');
+                }
                 docker.merge_tags.push(`${docker.image.prefix}${tag}${docker.image.suffix}`);
               }
 
@@ -347,6 +370,7 @@ jobs:
               core.exportVariable('DOCKER_IMAGE_PLATFORM_SANITIZED', docker.image.platform.sanitized);
               core.exportVariable('DOCKER_IMAGE_NAME_AND_VERSION', `${docker.image.name}:${docker.app.version}`);
               core.setOutput('DOCKER_IMAGE_NAME_AND_VERSION', `${docker.image.name}:${docker.app.version}`);
+              core.exportVariable('DOCKER_APP_VERSION', `${docker.app.version}`);
 
               // CI/CD
               core.setOutput('DOCKER_CICD_LATEST', opt.dot?.CICD?.latest || false);
@@ -361,7 +385,7 @@ jobs:
 
               core.exportVariable('WORKFLOW_CREATE_RELEASE', (opt.input?.release === undefined) ? false : opt.input.release);
               core.exportVariable('WORKFLOW_CREATE_README', (opt.input?.readme === undefined) ? false : opt.input.readme);
-              core.exportVariable('WORKFLOW_GRYPE_FAIL_ON_SEVERITY', (opt.dot?.grype?.fail === undefined) ? true : opt.dot.grype.fail);
+              core.exportVariable('WORKFLOW_GRYPE_FAIL_ON_SEVERITY', docker.grype.fail);
               core.exportVariable('WORKFLOW_GRYPE_SEVERITY_CUTOFF', (opt.dot?.grype?.severity || 'critical'));
 
             // check if workflow needs to be registered
@@ -458,6 +482,12 @@ jobs:
           registry: quay.io
           username: 11notes+github
           password: ${{ secrets.QUAY_TOKEN }}
+
+      # HELM
+      - name: helm / setup
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: 'latest'
 
 
       # ╔═════════════════════════════════════════════════════╗
@@ -590,6 +620,20 @@ jobs:
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
 
+      # UPDATE HELM CHART
+      - name: helm / update
+        if: env.WORKFLOW_BUILD == 'true' && steps.image-push.outcome == 'success' && matrix.platform == 'amd64' && hashFiles('./chart/Chart.yaml') != ''
+        run: |
+          helm package ./chart --version "${{ env.DOCKER_APP_VERSION }}" --app-version "${{ env.DOCKER_APP_VERSION }}" -d ${{ runner.temp }}/helm
+          mv ${{ runner.temp }}/helm/*.tgz ${{ runner.temp }}/helm/chart.tgz
+
+      - name: helm / upload artifact
+        if: env.WORKFLOW_BUILD == 'true' && steps.image-push.outcome == 'success' && matrix.platform == 'amd64' && hashFiles('./chart/Chart.yaml') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: helm.tgz
+          path: ${{ runner.temp }}/helm
+
       # SET BUILD AS SUCCESSFULL
       - name: container image / success
         if: env.WORKFLOW_BUILD == 'true' && steps.image-push.outcome == 'success'
@@ -646,7 +690,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        registry: [docker.io, ghcr.io, quay.io]
+        registry: ${{ needs.docker.outputs.REGISTRY_QUAY == 'true' && fromJSON('["docker.io", "ghcr.io"]') || fromJSON('["docker.io", "ghcr.io", "quay.io"]') }}
 
     env:
       DOCKER_IMAGE_NAME: ${{ needs.docker.outputs.DOCKER_IMAGE_NAME }}
@@ -712,6 +756,12 @@ jobs:
           pattern: digests-*
           merge-multiple: true
 
+      # HELM
+      - name: helm / setup
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: 'latest'
+
       # SETUP BUILDX BUILDER
       - name: platform merge / buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
@@ -737,6 +787,36 @@ jobs:
         run: |
           docker buildx imagetools inspect ${{ matrix.registry }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.meta.outputs.version }}
 
+      # ╔═════════════════════════════════════════════════════╗
+      # ║                    HELM UPLOAD                      ║
+      # ╚═════════════════════════════════════════════════════╝
+      # LOAD ARTIFACT
+      - name: helm / load artifact
+        id: helm-artifact-download
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          name: helm.tgz
+          path: ${{ runner.temp }}/helm
+
+      # LOGIN HELM OCI
+      - name: helm / login
+        if: steps.helm-artifact-download.outcome == 'success'
+        run: |
+          case "${{ matrix.registry }}" in
+            "ghcr.io") echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "11notes" --password-stdin;;
+            "quay.io") echo "${{ secrets.QUAY_TOKEN }}" | helm registry login quay.io -u "11notes+github" --password-stdin;;
+          esac
+
+      # PUSH TO CHARTS OCI
+      - name: helm / push
+        if: steps.helm-artifact-download.outcome == 'success'
+        run: |
+          case "${{ matrix.registry }}" in
+            "ghcr.io") helm push "${{ runner.temp }}/helm/chart.tgz" "oci://${{ matrix.registry }}/11notes/charts";;
+            "quay.io") helm push "${{ runner.temp }}/helm/chart.tgz" "oci://${{ matrix.registry }}/11notes/charts";;
+          esac
+ 
 
   # ╔═════════════════════════════════════════════════════╗
   # ║                                                     ║
@@ -885,4 +965,4 @@ jobs:
               "secret":"${{ secrets.DOCKER_TOKEN }}"
             }' \
             --fail | jq -r ".access_token")
-          curl -s -H "Authorization: Bearer ${TOKEN}" -X DELETE https://hub.docker.com/v2/repositories/${{ env.DOCKER_IMAGE_NAME }}/tags/latest | echo ":latest tag not found"
+          curl -s -H "Authorization: Bearer ${TOKEN}" -X DELETE https://hub.docker.com/v2/repositories/${{ env.DOCKER_IMAGE_NAME }}/tags/latest || echo ":latest tag not found"
