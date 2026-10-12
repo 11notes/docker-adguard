@@ -31,16 +31,20 @@ jobs:
           ref: 'master'
           fetch-depth: 0
 
-      - name: get latest version and last tag
+      - name: get latest version and build
         run: |
-          export LATEST_VERSION=$(curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest | jq -r '.tag_name' | sed 's|v||')
-          export LATEST_TAG=$(git describe --abbrev=0 --tags `git rev-list --tags --max-count=1` | sed 's|v||')
-          echo "WORKFLOW_UPDATE_BASE64JSON=$(echo '{"version":"'${LATEST_VERSION}'", "tag":"'${LATEST_TAG}'", "unraid":true, "nobody":true}' | base64 -w 0)" >> "${GITHUB_ENV}"
+          echo "LATEST_VERSION=$(curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest | jq -r '.tag_name' | sed 's|v||')" >> "${GITHUB_ENV}"
+
+      - name: check if updated is needed
+        uses: 11notes/actions/update@v1 # v1
+        with:
+          latest: ${{ env.LATEST_VERSION }}
 
       - name: call org.update
-        uses: benc-uk/workflow-dispatch@7a027648b88c2413826b6ddd6c76114894dc5ec4 #v1.3.1
+        if: env.ACTIONS_UPDATE == 'true'
+        uses: benc-uk/workflow-dispatch@7a027648b88c2413826b6ddd6c76114894dc5ec4 # v1.3.1
         with:
           wait-for-completion: false
           workflow: org.update.yml
           token: "${{ secrets.REPOSITORY_TOKEN }}"
-          inputs: '{ "etc":"${{ env.WORKFLOW_UPDATE_BASE64JSON }}" }'
+          inputs: '{ "etc":"${{ env.ACTIONS_UPDATE_BASE64JSON }}" }'

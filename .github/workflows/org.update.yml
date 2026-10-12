@@ -115,10 +115,11 @@ jobs:
                 }
 
                 // semver
-                const latest = semverExceptions(semver.valid(semver.coerce(job.inputs.version)));
-                const current = semverExceptions(semver.valid(semver.coerce(job.json.semver.version)));
+                const latest = semver.valid(semver.coerce(job.inputs.version));
+                const current = semver.valid(semver.coerce(job.json.semver.version));
                 const tag = semver.valid(semver.coerce(job.inputs.tag));
                 const checks = {latestTagExists:false};
+                const force = job.inputs?.force || false;
 
                 try{
                   const tag = await fetch(`https://hub.docker.com/v2/repositories/${job.json.image}/tags/${latest}`);
@@ -131,8 +132,11 @@ jobs:
                 }
 
                 // compare
-                if(latest && latest !== current && !checks.latestTagExists){
-                  core.info(`new ${semver.diff(current, latest)} release found (${latest}), updating ...`)
+                if(force || (latest && latest !== current && !checks.latestTagExists)){
+                  if(force){
+                    core.info('force update image');
+                  }
+                  core.info(`new ${semver.diff(current, latest)} release found (${latest}), updating ...`);
                   job.json.semver.version = latest;
 
                   // check if app has additional parameters
@@ -141,10 +145,9 @@ jobs:
                     build.args = {
                       version_build:job.inputs.build,
                     };
-                    job.json.build.args.version_build = job.inputs.build;
+                    job.json.build = job.inputs.build;
                   }else if(job.inputs?.build?.args){
-                    build.args = job.inputs.build.args;
-                    job.json.build.args.version_build = job.inputs.build.args;
+                    job.json.build.args = job.inputs.build.args;
                   }
 
                   // update .json

@@ -347,6 +347,7 @@ jobs:
                   docker.app[arg] = opt.dot.build.args[arg];
                 }
               }
+
               const arguments = [];
               for(const argument in docker.app){
                 arguments.push(`APP_${argument.toUpperCase()}=${docker.app[argument]}`);
@@ -483,12 +484,6 @@ jobs:
           username: 11notes+github
           password: ${{ secrets.QUAY_TOKEN }}
 
-      # HELM
-      - name: helm / setup
-        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
-        with:
-          version: 'latest'
-
 
       # ╔═════════════════════════════════════════════════════╗
       # ║               BUILD CONTAINER IMAGE                 ║
@@ -620,20 +615,6 @@ jobs:
           path: ${{ runner.temp }}/digests/*
           if-no-files-found: error
 
-      # UPDATE HELM CHART
-      - name: helm / update
-        if: env.WORKFLOW_BUILD == 'true' && steps.image-push.outcome == 'success' && matrix.platform == 'amd64' && hashFiles('./chart/Chart.yaml') != ''
-        run: |
-          helm package ./chart --version "${{ env.DOCKER_APP_VERSION }}" --app-version "${{ env.DOCKER_APP_VERSION }}" -d ${{ runner.temp }}/helm
-          mv ${{ runner.temp }}/helm/*.tgz ${{ runner.temp }}/helm/chart.tgz
-
-      - name: helm / upload artifact
-        if: env.WORKFLOW_BUILD == 'true' && steps.image-push.outcome == 'success' && matrix.platform == 'amd64' && hashFiles('./chart/Chart.yaml') != ''
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: helm.tgz
-          path: ${{ runner.temp }}/helm
-
       # SET BUILD AS SUCCESSFULL
       - name: container image / success
         if: env.WORKFLOW_BUILD == 'true' && steps.image-push.outcome == 'success'
@@ -654,12 +635,12 @@ jobs:
       # CREATE GITHUB RELEASE
       - name: github release / create
         if: env.WORKFLOW_CREATE_RELEASE == 'true' && steps.git-release.outcome == 'success'
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          name: ${{ github.ref_name }}
           body: ${{ steps.git-release.outputs.release }}
           draft: false
           prerelease: false
@@ -690,7 +671,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        registry: ${{ needs.docker.outputs.REGISTRY_QUAY == 'true' && fromJSON('["docker.io", "ghcr.io"]') || fromJSON('["docker.io", "ghcr.io", "quay.io"]') }}
+        registry: ${{ needs.docker.outputs.REGISTRY_QUAY == 'true' && fromJSON('["docker.io", "ghcr.io", "quay.io"]') || fromJSON('["docker.io", "ghcr.io"]') }}
 
     env:
       DOCKER_IMAGE_NAME: ${{ needs.docker.outputs.DOCKER_IMAGE_NAME }}
@@ -756,12 +737,6 @@ jobs:
           pattern: digests-*
           merge-multiple: true
 
-      # HELM
-      - name: helm / setup
-        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
-        with:
-          version: 'latest'
-
       # SETUP BUILDX BUILDER
       - name: platform merge / buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
@@ -786,36 +761,6 @@ jobs:
       - name: platform merge / inspect
         run: |
           docker buildx imagetools inspect ${{ matrix.registry }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.meta.outputs.version }}
-
-      # ╔═════════════════════════════════════════════════════╗
-      # ║                    HELM UPLOAD                      ║
-      # ╚═════════════════════════════════════════════════════╝
-      # LOAD ARTIFACT
-      - name: helm / load artifact
-        id: helm-artifact-download
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        continue-on-error: true
-        with:
-          name: helm.tgz
-          path: ${{ runner.temp }}/helm
-
-      # LOGIN HELM OCI
-      - name: helm / login
-        if: steps.helm-artifact-download.outcome == 'success'
-        run: |
-          case "${{ matrix.registry }}" in
-            "ghcr.io") echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "11notes" --password-stdin;;
-            "quay.io") echo "${{ secrets.QUAY_TOKEN }}" | helm registry login quay.io -u "11notes+github" --password-stdin;;
-          esac
-
-      # PUSH TO CHARTS OCI
-      - name: helm / push
-        if: steps.helm-artifact-download.outcome == 'success'
-        run: |
-          case "${{ matrix.registry }}" in
-            "ghcr.io") helm push "${{ runner.temp }}/helm/chart.tgz" "oci://${{ matrix.registry }}/11notes/charts";;
-            "quay.io") helm push "${{ runner.temp }}/helm/chart.tgz" "oci://${{ matrix.registry }}/11notes/charts";;
-          esac
  
 
   # ╔═════════════════════════════════════════════════════╗
@@ -947,6 +892,13 @@ jobs:
               "has_projects":false,
               "has_wiki":false
             }' \
+            --fail
+
+          curl --request PUT \
+            --url https://api.github.com/repos/${{ github.repository }}/actions/permissions/artifact-and-log-retention \
+            --header 'authorization: Bearer ${{ secrets.REPOSITORY_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{"days": 1}' \
             --fail
 
       # ╔═════════════════════════════════════════════════════╗

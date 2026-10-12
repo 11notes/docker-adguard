@@ -20,5 +20,7 @@
     "comparison": {
       "image": "adguard/adguardhome"
     }
-  }
+  },
+  "unraid": true,
+  "nobody": true
 }
