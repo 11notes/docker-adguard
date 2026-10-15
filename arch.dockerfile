@@ -23,10 +23,7 @@
   ARG APP_GO_VERSION
   COPY ./build/entrypoint /go/entrypoint
   RUN set -ex; \
-    cd /go/entrypoint; \
-    go mod edit -go=${APP_GO_VERSION}; \
-    eleven go build /entrypoint main.go; \
-    eleven distroless /entrypoint;
+    eleven go build-entrypoint;
 
 # :: ADGUARD
   FROM 11notes/go:${APP_GO_VERSION} AS build
