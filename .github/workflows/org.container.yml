@@ -636,9 +636,8 @@ jobs:
       - name: github release / create
         if: env.WORKFLOW_CREATE_RELEASE == 'true' && steps.git-release.outcome == 'success'
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          token: ${{ secrets.REPOSITORY_TOKEN }}
           tag_name: ${{ github.ref }}
           name: ${{ github.ref_name }}
           body: ${{ steps.git-release.outputs.release }}
