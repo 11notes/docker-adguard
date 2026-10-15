@@ -11,8 +11,10 @@
       BUILD_SRC=AdguardTeam/AdGuardHome.git
 
 # :: FOREIGN IMAGES
+  FROM 11notes/util:bin AS util-bin
   FROM 11notes/distroless AS distroless
   FROM 11notes/distroless:dnslookup AS distroless-dnslookup
+  
 
 
 # ╔═════════════════════════════════════════════════════╗
@@ -20,6 +22,7 @@
 # ╚═════════════════════════════════════════════════════╝
 # :: ENTRYPOINT
   FROM 11notes/go:${APP_GO_VERSION} AS entrypoint
+  COPY --from=util-bin / /
   ARG APP_GO_VERSION
   COPY ./build/entrypoint /go/entrypoint
   RUN set -ex; \
@@ -27,6 +30,7 @@
 
 # :: ADGUARD
   FROM 11notes/go:${APP_GO_VERSION} AS build
+  COPY --from=util-bin / /
   ARG APP_VERSION \
       BUILD_ROOT \
       BUILD_SRC \
