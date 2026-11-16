@@ -33,7 +33,7 @@ jobs:
 
       - name: get latest version and build
         run: |
-          echo "LATEST_VERSION=$(curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest | jq -r '.tag_name' | sed 's|v||')" >> "${GITHUB_ENV}"
+          echo "LATEST_VERSION=$(curl -sSL https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest | jq -r '.tag_name' | sed 's|v||')" >> "${GITHUB_ENV}"
 
       - name: check if updated is needed
         uses: 11notes/actions/update@v1 # v1

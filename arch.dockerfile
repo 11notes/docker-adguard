@@ -14,7 +14,7 @@
   FROM 11notes/util:bin AS util-bin
   FROM 11notes/distroless AS distroless
   FROM 11notes/distroless:dnslookup AS distroless-dnslookup
-  
+
 
 
 # ╔═════════════════════════════════════════════════════╗
